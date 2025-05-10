@@ -4,6 +4,7 @@
 This module provides a client for interacting with the 1WorldSync API.
 """
 
+import os
 import requests
 import urllib.parse
 from .auth import HMACAuth
@@ -18,19 +19,49 @@ class OneWorldSyncClient:
     handling authentication, request construction, and response parsing.
     """
     
-    def __init__(self, app_id, secret_key, use_production=False, timeout=30):
+    def __init__(self, app_id=None, secret_key=None, api_url=None, timeout=30):
         """
         Initialize the 1WorldSync API client
         
         Args:
-            app_id (str): The application ID provided by 1WorldSync
-            secret_key (str): The secret key provided by 1WorldSync
-            use_production (bool, optional): Whether to use the production API. Defaults to False.
+            app_id (str, optional): The application ID provided by 1WorldSync. 
+                                   If None, will try to get from ONEWORLDSYNC_APP_ID environment variable.
+            secret_key (str, optional): The secret key provided by 1WorldSync.
+                                       If None, will try to get from ONEWORLDSYNC_SECRET_KEY environment variable.
+            api_url (str, optional): The API URL to use. 
+                                    If None, will try to get from ONEWORLDSYNC_API_URL environment variable.
+                                    Defaults to preprod API if not specified.
             timeout (int, optional): Request timeout in seconds. Defaults to 30.
         """
-        self.auth = HMACAuth(app_id, secret_key)
+        # Get credentials from environment variables if not provided
+        self.app_id = app_id or os.environ.get('ONEWORLDSYNC_APP_ID')
+        self.secret_key = secret_key or os.environ.get('ONEWORLDSYNC_SECRET_KEY')
+        
+        if not self.app_id or not self.secret_key:
+            raise ValueError("APP_ID and SECRET_KEY must be provided either as parameters or environment variables")
+        
+        self.auth = HMACAuth(self.app_id, self.secret_key)
         self.protocol = 'https://'
-        self.domain = 'marketplace.api.1worldsync.com' if use_production else 'marketplace.preprod.api.1worldsync.com'
+        
+        # Get API URL from environment variable if not provided
+        default_api_url = 'marketplace.preprod.api.1worldsync.com'
+        if api_url:
+            # If full URL is provided, extract just the domain
+            if '://' in api_url:
+                self.domain = api_url.split('://')[-1].split('/')[0]
+            else:
+                self.domain = api_url
+        else:
+            env_api_url = os.environ.get('ONEWORLDSYNC_API_URL')
+            if env_api_url:
+                # If full URL is provided in env var, extract just the domain
+                if '://' in env_api_url:
+                    self.domain = env_api_url.split('://')[-1].split('/')[0]
+                else:
+                    self.domain = env_api_url
+            else:
+                self.domain = default_api_url
+        
         self.timeout = timeout
     
     def _make_request(self, method, path, params=None, data=None, headers=None):
