@@ -21,10 +21,9 @@ def main():
     
     try:
         # Perform a free text search
-        print("Performing free text search for 'jerry'...")
+        print("Performing free text search for 'jelly'...")
         results = client.free_text_search(
-            "jerry",
-            geo_location=(9.91, 51.51)  # Optional geo location
+            "jelly"
         )
         
         # Print search results summary
@@ -66,8 +65,21 @@ def main():
         
         # Advanced search example
         print("\n\nPerforming advanced search for UPC '00007252147019'...")
-        adv_results = client.advanced_search("itemPrimaryId", "00007252147019")
-        print(f"Found {len(adv_results)} products")
+        
+        # Try different field names for UPC searches
+        upc = "00007252147019"
+        field_names = ["gtin", "itemId", "item.itemIdentificationInformation.itemIdentifier.itemId"]
+        
+        for field in field_names:
+            print(f"\nTrying field name: {field}")
+            try:
+                adv_results = client.advanced_search(field, upc)
+                print(f"Success! Found {len(adv_results)} products")
+                # If successful, break out of the loop
+                break
+            except APIError as e:
+                print(f"Failed with field '{field}': {e}")
+                print(f"Status code: {e.status_code}")
         
     except AuthenticationError as e:
         print(f"Authentication error: {e}")

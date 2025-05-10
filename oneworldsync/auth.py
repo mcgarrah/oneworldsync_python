@@ -76,9 +76,41 @@ class HMACAuth:
         if 'TIMESTAMP' not in params:
             params['TIMESTAMP'] = self.generate_timestamp()
         
-        # Create the string to hash
-        param_string = '&'.join([f"{k}={v}" for k, v in sorted(params.items())])
-        string_to_hash = f"/{path}?{param_string}"
+        # Create the string to hash - following the exact format from the working example
+        # The order of parameters is critical for the hash calculation
+        
+        # Start with the path and app_id
+        string_to_hash = f"/{path}?app_id={self.app_id}"
+        
+        # Add parameters in the exact order that works with the API
+        # This order is based on the working examples
+        
+        # Common search parameters
+        if 'searchType' in params:
+            string_to_hash += f"&searchType={params['searchType']}"
+        
+        if 'query' in params:
+            string_to_hash += f"&query={params['query']}"
+        
+        if 'access_mdm' in params:
+            string_to_hash += f"&access_mdm={params['access_mdm']}"
+        
+        # Always include timestamp
+        string_to_hash += f"&TIMESTAMP={params['TIMESTAMP']}"
+        
+        # Add any remaining parameters in alphabetical order
+        # This is a best practice when the exact order isn't known
+        remaining_params = []
+        for k, v in params.items():
+            if k not in ['app_id', 'searchType', 'query', 'access_mdm', 'TIMESTAMP', 'hash_code']:
+                remaining_params.append((k, v))
+        
+        # Sort remaining parameters by key
+        remaining_params.sort(key=lambda x: x[0])
+        
+        # Add remaining parameters to string
+        for k, v in remaining_params:
+            string_to_hash += f"&{k}={v}"
         
         # Generate hash code
         hash_code = self.generate_hash(string_to_hash)
@@ -104,13 +136,38 @@ class HMACAuth:
         # Prepare authentication parameters
         auth_params = self.prepare_auth_params(path, query_params)
         
-        # URL encode parameters
-        encoded_params = []
-        for key, value in auth_params.items():
-            encoded_key = urllib.parse.quote(str(key))
-            encoded_value = urllib.parse.quote(str(value))
-            encoded_params.append(f"{encoded_key}={encoded_value}")
+        # Construct URL with parameters in the correct order
+        # This order must match the order used in prepare_auth_params
+        url = f"{protocol}{domain}/{path}?app_id={self.app_id}"
         
-        # Construct URL
-        query_string = '&'.join(encoded_params)
-        return f"{protocol}{domain}/{path}?{query_string}"
+        # Add parameters in the same order as in prepare_auth_params
+        if 'searchType' in auth_params:
+            url += f"&searchType={urllib.parse.quote(str(auth_params['searchType']))}"
+        
+        if 'query' in auth_params:
+            url += f"&query={urllib.parse.quote(str(auth_params['query']))}"
+        
+        if 'access_mdm' in auth_params:
+            url += f"&access_mdm={urllib.parse.quote(str(auth_params['access_mdm']))}"
+        
+        # Add timestamp
+        url += f"&TIMESTAMP={urllib.parse.quote(str(auth_params['TIMESTAMP']))}"
+        
+        # Add remaining parameters in alphabetical order
+        remaining_params = []
+        for k, v in auth_params.items():
+            if k not in ['app_id', 'searchType', 'query', 'access_mdm', 'TIMESTAMP', 'hash_code']:
+                remaining_params.append((k, v))
+        
+        # Sort remaining parameters by key
+        remaining_params.sort(key=lambda x: x[0])
+        
+        # Add remaining parameters to URL
+        for k, v in remaining_params:
+            url += f"&{k}={urllib.parse.quote(str(v))}"
+        
+        # Add hash code last
+        hash_code = auth_params['hash_code']
+        url += f"&hash_code={urllib.parse.quote(hash_code).replace('/', '%2F')}"
+        
+        return url

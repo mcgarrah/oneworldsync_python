@@ -103,12 +103,15 @@ class OneWorldSyncClient:
         Returns:
             dict: Search results
         """
-        # Prepare parameters
+        # Prepare parameters - use exact parameter names from the API documentation
         params = {
             'searchType': search_type,
             'query': query,
             'access_mdm': access_mdm,
         }
+        
+        # Debug the parameters
+        print(f"DEBUG - Search parameters: {params}")
         
         # Add geo location if provided
         if geo_location:
@@ -119,7 +122,11 @@ class OneWorldSyncClient:
         params.update(kwargs)
         
         # Make request
-        return self._make_request('GET', 'V2/products', params)
+        response = self._make_request('GET', 'V2/products', params)
+        
+        # Import here to avoid circular imports
+        from .models import SearchResults
+        return SearchResults(response)
     
     def get_product(self, product_id, **kwargs):
         """
@@ -151,8 +158,30 @@ class OneWorldSyncClient:
         Returns:
             dict: Search results
         """
+        # Try different query formats for advanced search
+        # Format 1: field:value (standard Lucene syntax)
         query = f"{field}:{value}"
-        return self.search_products('advancedSearch', query, access_mdm, **kwargs)
+        
+        # Print debug info
+        print(f"DEBUG - Advanced search query: {query}")
+        
+        try:
+            return self.search_products('advancedSearch', query, access_mdm, **kwargs)
+        except APIError as e:
+            if e.status_code == 400:
+                # If the standard format fails, try with quotes
+                query = f"{field}:\"{value}\""
+                print(f"DEBUG - Retrying with quoted value: {query}")
+                try:
+                    return self.search_products('advancedSearch', query, access_mdm, **kwargs)
+                except APIError:
+                    # If that fails too, try with a JSON-like format
+                    query = f"\"{field}\":\"{value}\""
+                    print(f"DEBUG - Retrying with JSON-like format: {query}")
+                    return self.search_products('advancedSearch', query, access_mdm, **kwargs)
+            else:
+                # If it's not a 400 error, re-raise the original exception
+                raise
     
     def free_text_search(self, query, access_mdm='computer', **kwargs):
         """
