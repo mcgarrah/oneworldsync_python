@@ -6,7 +6,6 @@ This module provides a client for interacting with the 1WorldSync API.
 
 import os
 import requests
-import urllib.parse
 from .auth import HMACAuth
 from .exceptions import APIError, AuthenticationError
 

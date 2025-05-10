@@ -11,15 +11,15 @@ from oneworldsync import OneWorldSyncClient, AuthenticationError, APIError
 
 # Load environment variables from .env file
 load_dotenv()
-APP_ID = os.getenv("ONEWORLDSYNC_APP_ID")
-SECRET_KEY = os.getenv("ONEWORLDSYNC_SECRET_KEY")
-API_URL = os.getenv("ONEWORLDSYNC_API_URL")
+ONEWORLDSYNC_APP_ID = os.getenv("ONEWORLDSYNC_APP_ID")
+ONEWORLDSYNC_SECRET_KEY = os.getenv("ONEWORLDSYNC_SECRET_KEY")
+ONEWORLDSYNC_API_URL = os.getenv("ONEWORLDSYNC_API_URL")
 
 def main():
     """Main function demonstrating the 1WorldSync client usage for product fetching"""
     
     # Initialize client
-    client = OneWorldSyncClient(app_id=APP_ID, secret_key=SECRET_KEY, api_url=API_URL)
+    client = OneWorldSyncClient(app_id=ONEWORLDSYNC_APP_ID, secret_key=ONEWORLDSYNC_SECRET_KEY, api_url=ONEWORLDSYNC_API_URL)
     
     try:
         # First, search for a product to get its ID

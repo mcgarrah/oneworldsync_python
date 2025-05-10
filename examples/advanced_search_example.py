@@ -11,9 +11,9 @@ from oneworldsync import OneWorldSyncClient, AuthenticationError, APIError
 
 # Load environment variables from .env file
 load_dotenv()
-APP_ID = os.getenv("ONEWORLDSYNC_APP_ID")
-SECRET_KEY = os.getenv("ONEWORLDSYNC_SECRET_KEY")
-API_URL = os.getenv("ONEWORLDSYNC_API_URL")
+ONEWORLDSYNC_APP_ID = os.getenv("ONEWORLDSYNC_APP_ID")
+ONEWORLDSYNC_SECRET_KEY = os.getenv("ONEWORLDSYNC_SECRET_KEY")
+ONEWORLDSYNC_API_URL = os.getenv("ONEWORLDSYNC_API_URL")
 
 def main():
     """Main function demonstrating advanced search with different field names"""
