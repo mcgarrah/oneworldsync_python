@@ -7,4 +7,13 @@
 - [x] REST-API.md to document query and fetch interfaces
 - [x] setup PyPi account
 - [x] `.github` for PyPi packaging and Github management
+- [x] enabled `sphinx` and doc-build
+- [x] write doc content for `sphinx`
+- [x] create a [oneworldsync-python](https://oneworldsync-python.readthedocs.io/) doc website
+- [x] create some vscode convenience entries
+- [x] add a `.github/dependabot.yaml` for github dependency monitoring
+- [ ] Review [Github-Actions-Python](https://realpython.com/github-actions-python/) article
+  - [ ] add a `pytest` github action to test a matrix of python versions
+  - [ ] add a python `linter` github action to review code
+  - [ ] review existing PyPi to add the tagging and release `gh release ...`
 - [ ] Examples of useful search and fetch for a webapp

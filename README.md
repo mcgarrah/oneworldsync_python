@@ -168,13 +168,13 @@ This project includes VS Code configuration files to streamline development:
 
 #### Debug Configurations (launch.json)
 
-- **Python: Current File** - Run and debug the currently open file
-- **Python: Search Example** - Run the basic search example
-- **Python: Advanced Search Example** - Run the advanced search example
-- **Python: Product Fetch Example** - Run the product fetch example
-- **Python: Debug Tests** - Debug the current test file
-- **Python: All Tests** - Run all tests with verbose output
-- **Python: Tests with Coverage** - Run tests with coverage reporting
+* **Python: Current File** - Run and debug the currently open file
+* **Python: Search Example** - Run the basic search example
+* **Python: Advanced Search Example** - Run the advanced search example
+* **Python: Product Fetch Example** - Run the product fetch example
+* **Python: Debug Tests** - Debug the current test file
+* **Python: All Tests** - Run all tests with verbose output
+* **Python: Tests with Coverage** - Run tests with coverage reporting
 
 To use these configurations, press F5 or select from the debug dropdown in VS Code.
 
@@ -182,16 +182,16 @@ To use these configurations, press F5 or select from the debug dropdown in VS Co
 
 Run common development tasks with `Ctrl+Shift+P` → "Tasks: Run Task":
 
-- **Run Tests** - Run pytest on the project
-- **Run Tests with Coverage** - Run tests with coverage reporting
-- **Lint with Flake8** - Check code style with Flake8
-- **Format with Black** - Format code with Black
-- **Sort imports with isort** - Sort imports with isort
-- **Type check with mypy** - Run static type checking
-- **Build Documentation** - Build Sphinx documentation
-- **Update Version** - Run the version update script with a prompt for the new version
-- **Install Development Dependencies** - Install dev dependencies
-- **Install Documentation Dependencies** - Install docs dependencies
+* **Run Tests** - Run pytest on the project
+* **Run Tests with Coverage** - Run tests with coverage reporting
+* **Lint with Flake8** - Check code style with Flake8
+* **Format with Black** - Format code with Black
+* **Sort imports with isort** - Sort imports with isort
+* **Type check with mypy** - Run static type checking
+* **Build Documentation** - Build Sphinx documentation
+* **Update Version** - Run the version update script with a prompt for the new version
+* **Install Development Dependencies** - Install dev dependencies
+* **Install Documentation Dependencies** - Install docs dependencies
 
 ### Running Tests
 
@@ -221,8 +221,8 @@ python version_update.py 0.1.4
 
 If you encounter authentication issues, check that:
 
-1. Your ONEWORLDSYNC_APP_ID and ONEWORLDSYNC_SECRET_KEY are correct
-2. You're using the correct environment (production vs. preprod) for your credentials
+1. Your `ONEWORLDSYNC_APP_ID`, `ONEWORLDSYNC_SECRET_KEY` and `ONEWORLDSYNC_API_URL` are correct and in sync.
+2. You're using the correct environment (production vs. preprod) for your credentials.
 3. Your system clock is synchronized (timestamp accuracy is important for authentication)
 
 For API errors with status code 400, check the response message for details about which parameters might be invalid.
