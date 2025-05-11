@@ -24,7 +24,7 @@ def main():
     try:
         # First, search for a product to get its ID
         print("Searching for a product to get its ID...")
-        results = client.free_text_search("apple", limit=1)
+        results = client.free_text_search("milk", rows=1)
         
         if not results.products:
             print("No products found in search.")
@@ -32,8 +32,9 @@ def main():
         
         # Get the first product's ID
         product = results.products[0]
-        product_id = product.item_id
-        
+        #product_id = product.item_id
+        product_id = product.item['itemIdentificationInformation']['itemReferenceIdInformation']['itemReferenceId']
+
         if not product_id:
             print("Could not determine product ID from search results.")
             return

@@ -22,9 +22,9 @@ def main():
     
     try:
         # Perform a free text search
-        print("Performing free text search for 'jelly'...")
+        print("Performing free text search for 'milk'...")
         results = client.free_text_search(
-            "jelly"
+            "milk"
         )
         
         # Print search results summary
@@ -48,6 +48,12 @@ def main():
                     desc = desc[:97] + "..."
                 print(f"  Description: {desc}")
             
+            # Print item Identification Information if available
+            iteminfo = product.item['itemIdentificationInformation']['itemReferenceIdInformation']
+            if iteminfo:
+                # Print item Identification Information if available
+                print(f"  itemReferenceId: {iteminfo['itemReferenceId']}")
+
             # Print dimensions if available
             dimensions = product.dimensions
             if dimensions and dimensions.get('height', {}).get('value'):
@@ -64,18 +70,22 @@ def main():
                 if len(images) > 3:
                     print(f"    ... and {len(images) - 3} more images")
         
+
+        # Advanced search on Print product attributes if available
+
         # Advanced search example
-        print("\n\nPerforming advanced search for UPC '00007252147019'...")
+        print("\n\nPerforming advanced search for UPC '16241419122223' (milk)...")
         
         # Try different field names for UPC searches
-        upc = "00007252147019"
-        field_names = ["gtin", "itemId", "item.itemIdentificationInformation.itemIdentifier.itemId"]
-        
+        upc = "16241419122223"  #milk search
+        field_names = ["itemIdentifier"]
+
         for field in field_names:
             print(f"\nTrying field name: {field}")
             try:
                 adv_results = client.advanced_search(field, upc)
                 print(f"Success! Found {len(adv_results)} products")
+                print(f"Response code: {adv_results}")
                 # If successful, break out of the loop
                 break
             except APIError as e:

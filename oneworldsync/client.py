@@ -119,13 +119,13 @@ class OneWorldSyncClient:
         except requests.exceptions.RequestException as e:
             raise APIError(0, str(e))
     
-    def search_products(self, search_type, query, access_mdm='computer', geo_location=None, **kwargs):
+    def search_products(self, query, search_type='freeTextSearch', access_mdm='computer', geo_location=None, **kwargs):
         """
         Search for products using the 1WorldSync API
         
         Args:
-            search_type (str): Type of search ('freeTextSearch', 'advancedSearch', etc.)
             query (str): Search query
+            search_type (str, optional): Type of search ('freeTextSearch', 'advancedSearch', 'categoryCode'). Defaults to 'freeTextSearch'.
             access_mdm (str, optional): Access MDM. Defaults to 'computer'.
             geo_location (tuple, optional): Tuple of (latitude, longitude). Defaults to None.
             **kwargs: Additional search parameters
@@ -158,19 +158,35 @@ class OneWorldSyncClient:
         from .models import SearchResults
         return SearchResults(response)
     
-    def get_product(self, product_id, **kwargs):
+    def get_product(self, product_id, access_mdm='computer', geo_location=None, **kwargs):
         """
-        Get a product by ID
+        Get a product by ID from the search results. It is not a UPC/EAN/GTIN.
+        itemReferenceId is the 1WorldSync assigned unique identifier for this product.
         
         Args:
             product_id (str): Product ID
+            access_mdm (str, optional): Access MDM. Defaults to 'computer'.
+            geo_location (tuple, optional): Tuple of (latitude, longitude). Defaults to None.
             **kwargs: Additional parameters
             
         Returns:
             dict: Product details
         """
-        # Prepare parameters
-        params = kwargs
+        # Prepare parameters - use exact parameter names from the API documentation
+        params = {
+            'access_mdm': access_mdm,
+        }
+        
+        # Debug the parameters
+        print(f"DEBUG - Search parameters: {params}")
+        
+        # Add geo location if provided
+        if geo_location:
+            params['geo_loc_access_latd'] = geo_location[0]
+            params['geo_loc_access_long'] = geo_location[1]
+        
+        # Add additional parameters
+        params.update(kwargs)
         
         # Make request
         return self._make_request('GET', f'V2/products/{product_id}', params)
@@ -196,19 +212,19 @@ class OneWorldSyncClient:
         print(f"DEBUG - Advanced search query: {query}")
         
         try:
-            return self.search_products('advancedSearch', query, access_mdm, **kwargs)
+            return self.search_products(query, 'advancedSearch', access_mdm, **kwargs)
         except APIError as e:
             if e.status_code == 400:
                 # If the standard format fails, try with quotes
                 query = f"{field}:\"{value}\""
                 print(f"DEBUG - Retrying with quoted value: {query}")
                 try:
-                    return self.search_products('advancedSearch', query, access_mdm, **kwargs)
+                    return self.search_products(query, 'advancedSearch', access_mdm, **kwargs)
                 except APIError:
                     # If that fails too, try with a JSON-like format
                     query = f"\"{field}\":\"{value}\""
                     print(f"DEBUG - Retrying with JSON-like format: {query}")
-                    return self.search_products('advancedSearch', query, access_mdm, **kwargs)
+                    return self.search_products(query, 'advancedSearch', access_mdm, **kwargs)
             else:
                 # If it's not a 400 error, re-raise the original exception
                 raise
@@ -225,4 +241,4 @@ class OneWorldSyncClient:
         Returns:
             dict: Search results
         """
-        return self.search_products('freeTextSearch', query, access_mdm, **kwargs)
+        return self.search_products(query, 'freeTextSearch', access_mdm, **kwargs)
