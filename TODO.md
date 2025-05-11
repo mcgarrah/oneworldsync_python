@@ -7,4 +7,4 @@
 - [x] REST-API.md to document query and fetch interfaces
 - [x] setup PyPi account
 - [x] `.github` for PyPi packaging and Github management
-- [ ] MORE THINKING NEEDED HERE
+- [ ] Examples of useful search and fetch for a webapp

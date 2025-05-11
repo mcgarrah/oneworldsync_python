@@ -1,6 +1,6 @@
 # 1WorldSync Python Client
 
-A comprehensive Python Client library module for accessing the 1WorldSync REST API.
+A Python Client library module for accessing the 1WorldSync Content1 Search and Fetch REST API.
 
 ## Package Structure
 
@@ -14,9 +14,11 @@ oneworldsync_python/
 │   ├── models.py        # Data models for API responses
 │   └── utils.py         # Utility functions
 ├── examples/
-│   ├── search_example.py        # Example for product search
-│   └── product_fetch_example.py # Example for fetching product details
+│   ├── search_example.py           # Example for product search
+│   ├── advanced_search_example.py  # Example for advanced product search
+│   └── product_fetch_example.py    # Example for fetching product details
 ├── README.md            # Documentation
+├── .env.example # Example environment variables file
 └── setup.py             # Package installation
 ```
 
@@ -49,8 +51,9 @@ The 1WorldSync API uses HMAC authentication. You'll need an App ID and Secret Ke
 You can store these credentials in a `.env` file:
 
 ``` ini
-APP_ID=your_app_id
-SECRET_KEY=your_secret_key
+ONEWORLDSYNC_APP_ID=your_app_id
+ONEWORLDSYNC_SECRET_KEY=your_secret_key
+ONEWORLDSYNC_API_URL=1ws_api_endpoint
 ```
 
 **Important Note**: The 1WorldSync API is very particular about the order of parameters in the authentication process. The parameters must be in a specific order when constructing the string to hash. This library handles this complexity for you, ensuring that parameters are ordered correctly for authentication.
@@ -66,14 +69,14 @@ from dotenv import load_dotenv
 
 # Load credentials from .env file
 load_dotenv()
-app_id = os.getenv("APP_ID")
-secret_key = os.getenv("SECRET_KEY")
+app_id = os.getenv("ONEWORLDSYNC_APP_ID")
+secret_key = os.getenv("ONEWORLDSYNC_SECRET_KEY")
 
 # Initialize client
 client = OneWorldSyncClient(app_id, secret_key)
 
 # Perform a free text search
-results = client.free_text_search("apple")
+results = client.free_text_search("milk")
 
 # Print number of results
 print(f"Found {len(results.products)} products")
@@ -89,7 +92,7 @@ if results.products:
 
 ```python
 # Search for a product by UPC
-results = client.advanced_search("itemPrimaryId", "00007252147019")
+results = client.advanced_search("itemIdentifier", "16241419122223")
 
 # Search with geo location
 results = client.free_text_search(
@@ -150,8 +153,8 @@ pytest
 
 If you encounter authentication issues, check that:
 
-1. Your APP_ID and SECRET_KEY are correct
-2. You're using the correct environment (production vs. preprod)
+1. Your ONEWORLDSYNC_APP_ID and ONEWORLDSYNC_SECRET_KEY are correct
+2. You're using the correct environment (production vs. preprod) for your credentials
 3. Your system clock is synchronized (timestamp accuracy is important for authentication)
 
 For API errors with status code 400, check the response message for details about which parameters might be invalid.
