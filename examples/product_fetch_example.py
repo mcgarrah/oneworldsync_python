@@ -11,19 +11,20 @@ from oneworldsync import OneWorldSyncClient, AuthenticationError, APIError
 
 # Load environment variables from .env file
 load_dotenv()
-APP_ID = os.getenv("APP_ID")
-SECRET_KEY = os.getenv("SECRET_KEY")
+ONEWORLDSYNC_APP_ID = os.getenv("ONEWORLDSYNC_APP_ID")
+ONEWORLDSYNC_SECRET_KEY = os.getenv("ONEWORLDSYNC_SECRET_KEY")
+ONEWORLDSYNC_API_URL = os.getenv("ONEWORLDSYNC_API_URL")
 
 def main():
     """Main function demonstrating the 1WorldSync client usage for product fetching"""
     
-    # Initialize client (using preprod environment)
-    client = OneWorldSyncClient(APP_ID, SECRET_KEY, use_production=False)
+    # Initialize client
+    client = OneWorldSyncClient(app_id=ONEWORLDSYNC_APP_ID, secret_key=ONEWORLDSYNC_SECRET_KEY, api_url=ONEWORLDSYNC_API_URL)
     
     try:
         # First, search for a product to get its ID
         print("Searching for a product to get its ID...")
-        results = client.free_text_search("apple", limit=1)
+        results = client.free_text_search("milk", rows=1)
         
         if not results.products:
             print("No products found in search.")
@@ -31,8 +32,9 @@ def main():
         
         # Get the first product's ID
         product = results.products[0]
-        product_id = product.item_id
-        
+        #product_id = product.item_id
+        product_id = product.item['itemIdentificationInformation']['itemReferenceIdInformation']['itemReferenceId']
+
         if not product_id:
             print("Could not determine product ID from search results.")
             return
