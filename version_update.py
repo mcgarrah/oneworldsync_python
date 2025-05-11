@@ -43,12 +43,12 @@ def update_file(file_path, pattern, replacement):
         print(f"Warning: File {file_path} not found.")
         return False
 
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf-8") as file:
         content = file.read()
 
     updated_content = re.sub(pattern, replacement, content)
 
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding="utf-8") as file:
         file.write(updated_content)
 
     print(f"Updated {file_path}")
@@ -59,7 +59,7 @@ def main():
     """Main function"""
     if len(sys.argv) != 2:
         print(f"Usage: {sys.argv[0]} NEW_VERSION")
-        print("Example: python version_update.py 0.1.4")
+        print("Example: python version_update.py 0.1.5")
         return 1
 
     new_version = sys.argv[1]

@@ -179,7 +179,7 @@ pytest --cov=oneworldsync
 
 ### Version Management
 
-To update the version number across all files (oneworldsync/__init__.py, pyproject.toml, and setup.py), use the provided script:
+To update the version number across all files (`oneworldsync/__init__.py`, `pyproject.toml`, and `setup.py`), use the provided script:
 
 ```bash
 # Update to version 0.1.4
