@@ -73,6 +73,7 @@ Contents
    dev/contributing
    dev/testing
    dev/releasing
+   dev/vscode
 
 Indices and tables
 -----------------

@@ -162,6 +162,37 @@ except APIError as e:
 
 ## Development
 
+### VS Code Integration
+
+This project includes VS Code configuration files to streamline development:
+
+#### Debug Configurations (launch.json)
+
+- **Python: Current File** - Run and debug the currently open file
+- **Python: Search Example** - Run the basic search example
+- **Python: Advanced Search Example** - Run the advanced search example
+- **Python: Product Fetch Example** - Run the product fetch example
+- **Python: Debug Tests** - Debug the current test file
+- **Python: All Tests** - Run all tests with verbose output
+- **Python: Tests with Coverage** - Run tests with coverage reporting
+
+To use these configurations, press F5 or select from the debug dropdown in VS Code.
+
+#### Tasks (tasks.json)
+
+Run common development tasks with `Ctrl+Shift+P` → "Tasks: Run Task":
+
+- **Run Tests** - Run pytest on the project
+- **Run Tests with Coverage** - Run tests with coverage reporting
+- **Lint with Flake8** - Check code style with Flake8
+- **Format with Black** - Format code with Black
+- **Sort imports with isort** - Sort imports with isort
+- **Type check with mypy** - Run static type checking
+- **Build Documentation** - Build Sphinx documentation
+- **Update Version** - Run the version update script with a prompt for the new version
+- **Install Development Dependencies** - Install dev dependencies
+- **Install Documentation Dependencies** - Install docs dependencies
+
 ### Running Tests
 
 ```bash
