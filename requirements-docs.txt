@@ -1,0 +1,6 @@
+# Include core requirements
+-r requirements.txt
+
+# Documentation dependencies
+sphinx>=4.0
+sphinx-rtd-theme>=1.0

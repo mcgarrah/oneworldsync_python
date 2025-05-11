@@ -10,4 +10,4 @@ from .client import OneWorldSyncClient
 from .auth import HMACAuth
 from .exceptions import OneWorldSyncError, AuthenticationError, APIError
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'

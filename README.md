@@ -17,8 +17,13 @@ oneworldsync_python/
 │   ├── search_example.py           # Example for product search
 │   ├── advanced_search_example.py  # Example for advanced product search
 │   └── product_fetch_example.py    # Example for fetching product details
+├── tests/               # Test suite
+│   ├── conftest.py      # Test configuration and fixtures
+│   ├── test_auth.py     # Tests for authentication
+│   ├── test_client.py   # Tests for API client
+│   └── ...              # Other test files
 ├── README.md            # Documentation
-├── .env.example # Example environment variables file
+├── .env.example         # Example environment variables file
 └── setup.py             # Package installation
 ```
 
@@ -42,6 +47,20 @@ Or install from source:
 git clone https://github.com/mcgarrah/oneworldsync_client.git
 cd oneworldsync_python
 pip install -e .
+```
+
+### Development Installation
+
+To install with development dependencies:
+
+```bash
+pip install -e ".[dev]"
+```
+
+Or using the requirements files:
+
+```bash
+pip install -r requirements-dev.txt
 ```
 
 ## Authentication
@@ -146,7 +165,25 @@ except APIError as e:
 ### Running Tests
 
 ```bash
+# Install test dependencies
+pip install -e ".[dev]"
+# or
+pip install -r requirements-dev.txt
+
+# Run tests
 pytest
+
+# Run tests with coverage
+pytest --cov=oneworldsync
+```
+
+### Version Management
+
+To update the version number across all files (oneworldsync/__init__.py, pyproject.toml, and setup.py), use the provided script:
+
+```bash
+# Update to version 0.1.4
+python version_update.py 0.1.4
 ```
 
 ## Troubleshooting
