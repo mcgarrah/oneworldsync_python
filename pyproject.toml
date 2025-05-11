@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oneworldsync"
+version = "0.1.2"
+description = "A Python client for the 1WorldSync Content1 Search and Fetch REST API"
+readme = "README.md"
+authors = [
+    {name = "Michael McGarrah", email = "mcgarrah@gmail.com"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "requests>=2.25.0",
+    "python-dotenv>=0.15.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/mcgarrah/oneworldsync_python"
+"Bug Tracker" = "https://github.com/mcgarrah/oneworldsync_python/issues"
+Repository = "https://github.com/mcgarrah/oneworldsync_python"
+
+[tool.setuptools]
+packages = ["oneworldsync"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
