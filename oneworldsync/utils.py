@@ -3,8 +3,7 @@ Utility functions for the 1WorldSync API client
 """
 
 import json
-from datetime import datetime
-
+from datetime import datetime, timezone
 
 def format_timestamp(dt=None):
     """
@@ -17,7 +16,7 @@ def format_timestamp(dt=None):
         str: Formatted timestamp
     """
     if dt is None:
-        dt = datetime.now(datetime.UTC)
+        dt = datetime.now(timezone.utc)
     
     return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
 

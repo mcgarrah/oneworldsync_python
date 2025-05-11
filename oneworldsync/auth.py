@@ -38,7 +38,7 @@ class HMACAuth:
         Returns:
             str: Timestamp in ISO 8601 format (YYYY-MM-DDThh:mm:ssZ)
         """
-        return datetime.datetime.now(datetime.UTC).strftime('%Y-%m-%dT%H:%M:%SZ')
+        return datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     
     def generate_hash(self, string_to_hash):
         """
