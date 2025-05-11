@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="oneworldsync",
-    version="0.1.1",
+    version="0.1.2",
     packages=find_packages(),
     install_requires=[
         "requests>=2.25.0",
@@ -10,7 +10,7 @@ setup(
     ],
     author="Michael McGarrah",
     author_email="mcgarrah@gmail.com",
-    description="A Python client for the 1WorldSync REST API",
+    description="A Python client for the 1WorldSync Content1 Search and Fetch REST API",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/mcgarrah/oneworldsync_python",
