@@ -243,3 +243,31 @@ class OneWorldSyncClient:
             dict: Search results
         """
         return self.search_products(query, 'freeTextSearch', access_mdm, **kwargs)
+
+    def category_code_search(self, query, access_mdm='computer', **kwargs):
+        """
+        Perform a gpc category search
+        
+        Args:
+            query (str): Search query
+            access_mdm (str, optional): Access MDM. Defaults to 'computer'.
+            **kwargs: Additional search parameters
+            
+        Returns:
+            dict: Search results
+        """
+        return self.search_products(query, 'categoryCode', access_mdm, **kwargs)
+
+    def get_product_details(self, product_id, access_mdm='computer', **kwargs):
+        """
+        Get product details by ID
+
+        Args:
+            product_id (str): Product ID
+            access_mdm (str, optional): Access MDM. Defaults to 'computer'.
+            **kwargs: Additional parameters
+
+        Returns:
+            dict: Product details
+        """
+        return self.get_product(product_id, access_mdm, **kwargs)
