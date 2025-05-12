@@ -28,16 +28,17 @@ class OneWorldSyncClient:
             secret_key (str, optional): The secret key provided by 1WorldSync.
                                        If None, will try to get from ONEWORLDSYNC_SECRET_KEY environment variable.
             api_url (str, optional): The API URL to use. 
-                                    If None, will try to get from ONEWORLDSYNC_API_URL environment variable.
+                                    If None, will try to get from ONEWORLDSYNC_SERVER_URL environment variable.
                                     Defaults to preprod API if not specified.
             timeout (int, optional): Request timeout in seconds. Defaults to 30.
         """
         # Get credentials from environment variables if not provided
         self.app_id = app_id or os.environ.get('ONEWORLDSYNC_APP_ID')
         self.secret_key = secret_key or os.environ.get('ONEWORLDSYNC_SECRET_KEY')
+        self.api_url = secret_key or os.environ.get('ONEWORLDSYNC_SERVER_URL')
         
-        if not self.app_id or not self.secret_key:
-            raise ValueError("APP_ID and SECRET_KEY must be provided either as parameters or environment variables")
+        if not self.app_id or not self.secret_key or not self.api_url:
+            raise ValueError("ONEWORLDSYNC_APP_ID, ONEWORLDSYNC_SECRET_KEY and ONEWORLDSYNC_SERVER_URL must be provided either as parameters or environment variables")
         
         self.auth = HMACAuth(self.app_id, self.secret_key)
         self.protocol = 'https://'
