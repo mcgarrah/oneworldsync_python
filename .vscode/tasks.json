@@ -134,13 +134,109 @@
                 "panel": "new"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Release: 1. Update Version",
+            "type": "shell",
+            "command": "python version_update.py ${input:version}",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: 2. Commit Version Changes",
+            "type": "shell",
+            "command": "git add . && git commit -m \"Bump version to v${input:version}\" && git push origin dev",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: 3. Create Pull Request",
+            "type": "shell",
+            "command": "gh pr create --base main --head dev --title \"Release v${input:version}\" --body \"${input:releaseNotes}\"",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: 4. Merge Pull Request",
+            "type": "shell",
+            "command": "gh pr merge ${input:prNumber} --merge",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: 5. Create GitHub Release",
+            "type": "shell",
+            "command": "git checkout main && git pull origin main && git tag v${input:version} && git push origin v${input:version} && gh release create v${input:version} --title \"Release v${input:version}\" --notes \"${input:releaseNotes}\"",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: 6. Build and Upload to PyPI",
+            "type": "shell",
+            "command": "python -m build && python -m twine upload dist/*",
+            "group": "none",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Release: Complete Process",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Release: 1. Update Version",
+                "Release: 2. Commit Version Changes",
+                "Release: 3. Create Pull Request"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
         }
     ],
     "inputs": [
         {
             "id": "version",
-            "description": "New version number (e.g., 0.1.4)",
-            "default": "0.1.4",
+            "description": "Version number (e.g., 0.1.7)",
+            "default": "0.1.7",
+            "type": "promptString"
+        },
+        {
+            "id": "releaseNotes",
+            "description": "Release notes",
+            "default": "Release version X.Y.Z with the following changes:\n- Feature 1\n- Feature 2\n- Bug fix 1",
+            "type": "promptString"
+        },
+        {
+            "id": "prNumber",
+            "description": "Pull request number",
+            "default": "",
             "type": "promptString"
         }
     ]

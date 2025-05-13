@@ -12,7 +12,8 @@
 - [x] create a [oneworldsync-python](https://oneworldsync-python.readthedocs.io/) doc website
 - [x] create some vscode convenience entries
 - [x] add a `.github/dependabot.yaml` for github dependency monitoring
-- [ ] Write up a release process that includes git, github, and externalities like PyPi and ReadTheDocs releases.
+- [x] Write up a release process that includes git, github, and externalities like PyPi and ReadTheDocs releases.
+- [x] Add a CHANGELOG.md for releases
 - [ ] Add python logging with debug levels rather than current print() statements
 - [ ] Review [Github-Actions-Python](https://realpython.com/github-actions-python/) article
   - [ ] add a `pytest` github action to test a matrix of python versions
