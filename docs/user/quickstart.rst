@@ -75,20 +75,19 @@ Iterate through search results:
 .. code-block:: python
 
    # Iterate through products
-   for product in results.products:
+   for product in results:
        print(f"ID: {product.item_id}")
        print(f"Brand: {product.brand_name}")
        print(f"Name: {product.product_name}")
        print(f"Description: {product.description}")
        
        # Get product dimensions
-       dimensions = product.dimensions
-       if dimensions:
-           print(f"Dimensions: {dimensions['height']['value']} {dimensions['height']['unit']} x "
-                 f"{dimensions['width']['value']} {dimensions['width']['unit']} x "
-                 f"{dimensions['depth']['value']} {dimensions['depth']['unit']}")
+       print(f"Dimensions: {product.formatted_dimensions}")
        
-       # Get product images
+       # Get primary image
+       print(f"Primary Image: {product.primary_image_url}")
+       
+       # Get all product images
        for image in product.images:
            print(f"Image URL: {image['url']} (Primary: {image['is_primary']})")
 
@@ -104,3 +103,24 @@ Get a specific product by ID:
    
    # Process the product data
    # Note: This returns the raw API response, not a Product object
+
+Converting to Dictionaries
+------------------------
+
+Convert products and search results to dictionaries for easier handling:
+
+.. code-block:: python
+
+   # Convert a product to a dictionary
+   product_dict = product.to_dict()
+   
+   # Convert entire search results to a dictionary
+   results_dict = results.to_dict()
+   
+   # Access metadata
+   metadata = results_dict['metadata']
+   print(f"Total results: {metadata['total_results']}")
+   
+   # Access products
+   for p in results_dict['products']:
+       print(f"{p['brand_name']} - {p['product_name']}")

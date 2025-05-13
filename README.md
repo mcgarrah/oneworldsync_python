@@ -16,7 +16,8 @@ oneworldsync_python/
 ├── examples/
 │   ├── search_example.py           # Example for product search
 │   ├── advanced_search_example.py  # Example for advanced product search
-│   └── product_fetch_example.py    # Example for fetching product details
+│   ├── product_fetch_example.py    # Example for fetching product details
+│   └── enhanced_search_example.py  # Example for enhanced data extraction
 ├── tests/               # Test suite
 │   ├── conftest.py      # Test configuration and fixtures
 │   ├── test_auth.py     # Tests for authentication
@@ -32,6 +33,7 @@ oneworldsync_python/
 * **HMAC Authentication**: Handles the complex HMAC authentication required by the 1WorldSync API.
 * **Easy-to-use Client**: Provides a simple interface for interacting with the API.
 * **Data Models**: Structured models for API responses, making it easier to work with the data.
+* **Enhanced Data Extraction**: Simplified access to product data with clean properties and dictionary conversion.
 * **Error Handling**: Custom exceptions for different types of errors.
 * **Examples**: Ready-to-use example scripts demonstrating common use cases.
 
@@ -107,6 +109,28 @@ if results.products:
     print(f"Description: {product.description}")
 ```
 
+### Enhanced Data Access
+
+```python
+# Search for products
+results = client.free_text_search("milk")
+
+# Access enhanced product properties
+for product in results:
+    print(f"ID: {product.item_id}")
+    print(f"GTIN: {product.gtin}")
+    print(f"Brand: {product.brand_name}")
+    print(f"Name: {product.product_name}")
+    print(f"Primary Image: {product.primary_image_url}")
+    print(f"Dimensions: {product.formatted_dimensions}")
+    
+    # Convert to dictionary for easier handling
+    product_dict = product.to_dict()
+    
+# Convert entire search results to dictionary
+results_dict = results.to_dict()
+```
+
 ### Advanced Search
 
 ```python
@@ -168,13 +192,13 @@ This project includes VS Code configuration files to streamline development:
 
 #### Debug Configurations (launch.json)
 
-* **Python: Current File** - Run and debug the currently open file
-* **Python: Search Example** - Run the basic search example
-* **Python: Advanced Search Example** - Run the advanced search example
-* **Python: Product Fetch Example** - Run the product fetch example
-* **Python: Debug Tests** - Debug the current test file
-* **Python: All Tests** - Run all tests with verbose output
-* **Python: Tests with Coverage** - Run tests with coverage reporting
+- **Python: Current File** - Run and debug the currently open file
+- **Python: Search Example** - Run the basic search example
+- **Python: Advanced Search Example** - Run the advanced search example
+- **Python: Product Fetch Example** - Run the product fetch example
+- **Python: Debug Tests** - Debug the current test file
+- **Python: All Tests** - Run all tests with verbose output
+- **Python: Tests with Coverage** - Run tests with coverage reporting
 
 To use these configurations, press F5 or select from the debug dropdown in VS Code.
 
@@ -182,16 +206,16 @@ To use these configurations, press F5 or select from the debug dropdown in VS Co
 
 Run common development tasks with `Ctrl+Shift+P` → "Tasks: Run Task":
 
-* **Run Tests** - Run pytest on the project
-* **Run Tests with Coverage** - Run tests with coverage reporting
-* **Lint with Flake8** - Check code style with Flake8
-* **Format with Black** - Format code with Black
-* **Sort imports with isort** - Sort imports with isort
-* **Type check with mypy** - Run static type checking
-* **Build Documentation** - Build Sphinx documentation
-* **Update Version** - Run the version update script with a prompt for the new version
-* **Install Development Dependencies** - Install dev dependencies
-* **Install Documentation Dependencies** - Install docs dependencies
+- **Run Tests** - Run pytest on the project
+- **Run Tests with Coverage** - Run tests with coverage reporting
+- **Lint with Flake8** - Check code style with Flake8
+- **Format with Black** - Format code with Black
+- **Sort imports with isort** - Sort imports with isort
+- **Type check with mypy** - Run static type checking
+- **Build Documentation** - Build Sphinx documentation
+- **Update Version** - Run the version update script with a prompt for the new version
+- **Install Development Dependencies** - Install dev dependencies
+- **Install Documentation Dependencies** - Install docs dependencies
 
 ### Running Tests
 
@@ -221,8 +245,8 @@ python version_update.py 0.1.4
 
 If you encounter authentication issues, check that:
 
-1. Your `ONEWORLDSYNC_APP_ID`, `ONEWORLDSYNC_SECRET_KEY` and `ONEWORLDSYNC_API_URL` are correct and in sync.
-2. You're using the correct environment (production vs. preprod) for your credentials.
+1. Your ONEWORLDSYNC_APP_ID and ONEWORLDSYNC_SECRET_KEY are correct
+2. You're using the correct environment (production vs. preprod) for your credentials
 3. Your system clock is synchronized (timestamp accuracy is important for authentication)
 
 For API errors with status code 400, check the response message for details about which parameters might be invalid.

@@ -24,7 +24,7 @@ You can also add additional parameters to refine your search:
 .. code-block:: python
 
    # Limit the number of results
-   results = client.advanced_search("brandName", "Organic", rows=5)
+   results = client.advanced_search("brandName", "Organic", limit=5)
    
    # Sort results
    results = client.advanced_search("productName", "Milk", sort="relevance")
@@ -37,14 +37,14 @@ When dealing with large result sets, you can use pagination:
 .. code-block:: python
 
    # Get the first page of results
-   results = client.free_text_search("milk", rows=10)
+   results = client.free_text_search("milk", limit=10)
    
    # Get the next cursor from the results
    next_cursor = results.next_cursor
    
    # If there's a next cursor, get the next page
    if next_cursor:
-       next_page = client.free_text_search("milk", rows=10, cursor=next_cursor)
+       next_page = client.free_text_search("milk", limit=10, cursor=next_cursor)
 
 Geo-Location Search
 -----------------
@@ -87,10 +87,10 @@ You can customize the request timeout:
        timeout=60  # 60 seconds
    )
 
-Working with Product Data
------------------------
+Enhanced Product Data Access
+--------------------------
 
-The Product class provides convenient properties for accessing common product attributes:
+The Product class provides enhanced properties for easier access to product data:
 
 .. code-block:: python
 
@@ -99,23 +99,54 @@ The Product class provides convenient properties for accessing common product at
    
    # Access basic information
    print(f"ID: {product.item_id}")
+   print(f"GTIN: {product.gtin}")
    print(f"Brand: {product.brand_name}")
    print(f"Name: {product.product_name}")
    print(f"Description: {product.description}")
    
-   # Access dimensions
-   dimensions = product.dimensions
-   if dimensions:
-       print(f"Height: {dimensions['height']['value']} {dimensions['height']['unit']}")
-       print(f"Width: {dimensions['width']['value']} {dimensions['width']['unit']}")
-       print(f"Depth: {dimensions['depth']['value']} {dimensions['depth']['unit']}")
+   # Access primary image URL directly
+   print(f"Primary Image: {product.primary_image_url}")
    
-   # Access images
+   # Get formatted dimensions as a string
+   print(f"Dimensions: {product.formatted_dimensions}")
+   
+   # Access additional product information
+   print(f"GPC Code: {product.gpc_code}")
+   print(f"Category: {product.category}")
+   print(f"Country of Origin: {product.country_of_origin}")
+   print(f"Ingredients: {product.ingredients}")
+   
+   # Access all images
    for image in product.images:
        print(f"Image URL: {image['url']}")
        print(f"Is Primary: {image['is_primary']}")
 
-You can also access the raw data directly:
+Converting to Dictionaries
+------------------------
+
+You can convert products and search results to clean dictionaries:
+
+.. code-block:: python
+
+   # Convert a product to a dictionary
+   product_dict = product.to_dict()
+   
+   # Convert entire search results to a dictionary
+   results_dict = results.to_dict()
+   
+   # Access metadata from the dictionary
+   metadata = results_dict['metadata']
+   print(f"Total results: {metadata['total_results']}")
+   
+   # Access products from the dictionary
+   products = results_dict['products']
+   for p in products:
+       print(f"{p['brand_name']} - {p['product_name']}")
+
+Raw Data Access
+------------
+
+You can still access the raw data directly if needed:
 
 .. code-block:: python
 
