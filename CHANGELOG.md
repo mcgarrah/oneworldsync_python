@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2025-05-13
+
+### Added
+- We've completely revamped the product data extraction functionality to make it easier for users to work with search results from the 1WorldSync Search REST API. Details in the commit history.
+
 ## [0.1.7] - 2025-05-12
 
 ### Added
