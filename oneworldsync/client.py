@@ -35,7 +35,7 @@ class OneWorldSyncClient:
         # Get credentials from environment variables if not provided
         self.app_id = app_id or os.environ.get('ONEWORLDSYNC_APP_ID')
         self.secret_key = secret_key or os.environ.get('ONEWORLDSYNC_SECRET_KEY')
-        self.api_url = secret_key or os.environ.get('ONEWORLDSYNC_SERVER_URL')
+        self.api_url = api_url or os.environ.get('ONEWORLDSYNC_SERVER_URL')
         
         if not self.app_id or not self.secret_key or not self.api_url:
             raise ValueError("ONEWORLDSYNC_APP_ID, ONEWORLDSYNC_SECRET_KEY and ONEWORLDSYNC_SERVER_URL must be provided either as parameters or environment variables")

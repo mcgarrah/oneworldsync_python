@@ -17,9 +17,10 @@ load_dotenv()
 # Get credentials from environment variables
 app_id = os.getenv("ONEWORLDSYNC_APP_ID")
 secret_key = os.getenv("ONEWORLDSYNC_SECRET_KEY")
+api_url = os.environ.get('ONEWORLDSYNC_SERVER_URL')
 
 # Initialize the client
-client = OneWorldSyncClient(app_id, secret_key)
+client = OneWorldSyncClient(app_id=app_id, secret_key=secret_key, api_url=api_url)
 
 def main():
     """Run the enhanced search example"""
@@ -29,7 +30,7 @@ def main():
     
     try:
         # Search for products
-        results = client.free_text_search(search_term, limit=5)
+        results = client.free_text_search(search_term, rows=5)
         
         # Display search metadata
         print(f"Found {results.total_results} products")
