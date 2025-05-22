@@ -93,12 +93,11 @@ class Content1Client:
         
         # Build the full URL
         url = f"{self.api_url}{uri}"
-        
-        # Print equivalent curl command for debugging
-        data_str = "" if data is None else f" -d '{json.dumps(data)}'"
-        headers_str = " ".join([f"-H \"{k}: {v}\"" for k, v in headers.items()])
-        curl_cmd = f"curl -X {method} \"{url}\" {headers_str}{data_str}"
-        print(f"Equivalent curl command:\n{curl_cmd}")
+        # Debug Print - equivalent curl command for debugging
+        # data_str = "" if data is None else f" -d '{json.dumps(data)}'"
+        # headers_str = " ".join([f"-H \"{k}: {v}\"" for k, v in headers.items()])
+        # curl_cmd = f"curl -X {method} \"{url}\" {headers_str}{data_str}"
+        # print(f"Equivalent curl command:\n{curl_cmd}")
         
         try:
             # Make the request
@@ -112,9 +111,14 @@ class Content1Client:
             
             # Check for errors
             if response.status_code == 401:
-                raise AuthenticationError("Authentication failed")
+                error_message = f"Authentication failed: {response.text}"
+                print(f"Authentication error details: Status {response.status_code}, Response: {response.text}")
+                print(f"Request URL: {url}")
+                print(f"Request headers: {headers}")
+                raise AuthenticationError(error_message)
             
             if response.status_code >= 400:
+                print(f"API error details: Status {response.status_code}, Response: {response.text}")
                 raise APIError(
                     response.status_code,
                     response.text,

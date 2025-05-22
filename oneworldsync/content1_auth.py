@@ -52,28 +52,18 @@ class Content1HMACAuth:
         Returns:
             str: Base64-encoded hash code
         """
-        # URL-encode the URI before hashing - use encodeURIComponent equivalent
-        # This is critical to match the TypeScript implementation
-        encoded_uri = urllib.parse.quote(uri, safe='')
-        
-        # Print debug info
-        print(f"Original URI: {uri}")
-        print(f"Encoded URI: {encoded_uri}")
-        print(f"Secret key: {self.secret_key}")
+        # According to the error "Hashcode mismatch", we need to ensure our hash matches
+        # what the server expects. Let's try without URL encoding the URI.
         
         # Create an HMAC using SHA256 and the secret key
         hash_obj = hmac.new(
             bytes(self.secret_key, 'utf-8'),
-            bytes(encoded_uri, 'utf-8'),
+            bytes(uri, 'utf-8'),
             hashlib.sha256
         )
         
-        # Get the hash and print it
-        hash_result = base64.b64encode(hash_obj.digest()).decode('utf-8')
-        print(f"Generated hash: {hash_result}")
-        
         # Return the Base64-encoded hash
-        return hash_result
+        return base64.b64encode(hash_obj.digest()).decode('utf-8')
     
     def generate_auth_headers(self, uri):
         """
@@ -88,16 +78,23 @@ class Content1HMACAuth:
         # Generate the hash code
         hash_code = self.generate_hash(uri)
         
+        # Debug information
+        # print(f"DEBUG - URI for hash generation: {uri}")
+        # print(f"DEBUG - Generated hash code: {hash_code}")
+        
         # Create headers
         headers = {
             'Content-Type': 'application/json',
             'accept': 'application/json',
-            'appid': self.app_id,
-            'hashcode': hash_code
+            'appId': self.app_id,  # Changed from 'appid' to 'appId' to match API requirements
+            'hashCode': hash_code  # Changed from 'hashcode' to 'hashCode' to match API requirements
         }
         
         # Add GLN if provided
         if self.gln:
             headers['gln'] = self.gln
+        
+        # Debug information
+        # print(f"DEBUG - Generated headers: {headers}")
         
         return headers
