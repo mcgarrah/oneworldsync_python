@@ -1,6 +1,6 @@
 # 1WorldSync Python Client
 
-A Python Client library module for accessing the 1WorldSync Content1 Search and Fetch REST API.
+A Python Client library module for accessing the 1WorldSync APIs, including both the Marketplace Search API and the Content1 API.
 
 ## Package Structure
 
@@ -8,8 +8,10 @@ A Python Client library module for accessing the 1WorldSync Content1 Search and 
 oneworldsync_python/
 ├── oneworldsync/
 │   ├── __init__.py      # Package exports
-│   ├── auth.py          # HMAC authentication
-│   ├── client.py        # Main API client
+│   ├── auth.py          # HMAC authentication for Marketplace API
+│   ├── client.py        # Main Marketplace API client
+│   ├── content1_auth.py # HMAC authentication for Content1 API
+│   ├── content1_client.py # Content1 API client
 │   ├── exceptions.py    # Custom exceptions
 │   ├── models.py        # Data models for API responses
 │   └── utils.py         # Utility functions
@@ -17,7 +19,8 @@ oneworldsync_python/
 │   ├── search_example.py           # Example for product search
 │   ├── advanced_search_example.py  # Example for advanced product search
 │   ├── product_fetch_example.py    # Example for fetching product details
-│   └── enhanced_search_example.py  # Example for enhanced data extraction
+│   ├── enhanced_search_example.py  # Example for enhanced data extraction
+│   └── content1_example.py         # Example for Content1 API usage
 ├── tests/               # Test suite
 │   ├── conftest.py      # Test configuration and fixtures
 │   ├── test_auth.py     # Tests for authentication
@@ -30,8 +33,8 @@ oneworldsync_python/
 
 ## Key Features
 
-* **HMAC Authentication**: Handles the complex HMAC authentication required by the 1WorldSync API.
-* **Easy-to-use Client**: Provides a simple interface for interacting with the API.
+* **HMAC Authentication**: Handles the complex HMAC authentication required by the 1WorldSync APIs.
+* **Easy-to-use Clients**: Provides simple interfaces for interacting with both Marketplace and Content1 APIs.
 * **Data Models**: Structured models for API responses, making it easier to work with the data.
 * **Enhanced Data Extraction**: Simplified access to product data with clean properties and dictionary conversion.
 * **Error Handling**: Custom exceptions for different types of errors.
@@ -67,21 +70,26 @@ pip install -r requirements-dev.txt
 
 ## Authentication
 
-The 1WorldSync API uses HMAC authentication. You'll need an App ID and Secret Key from 1WorldSync.
+The 1WorldSync APIs use HMAC authentication. You'll need an App ID and Secret Key from 1WorldSync.
 
 You can store these credentials in a `.env` file:
 
 ``` ini
+# For Marketplace API
 ONEWORLDSYNC_APP_ID=your_app_id
 ONEWORLDSYNC_SECRET_KEY=your_secret_key
-ONEWORLDSYNC_API_URL=1ws_api_endpoint
+ONEWORLDSYNC_API_URL=marketplace.api.1worldsync.com
+
+# For Content1 API
+ONEWORLDSYNC_USER_GLN=your_gln
+ONEWORLDSYNC_CONTENT1_API_URL=https://content1-api.1worldsync.com
 ```
 
-**Important Note**: The 1WorldSync API is very particular about the order of parameters in the authentication process. The parameters must be in a specific order when constructing the string to hash. This library handles this complexity for you, ensuring that parameters are ordered correctly for authentication.
+**Important Note**: The 1WorldSync APIs are very particular about the order of parameters in the authentication process. The parameters must be in a specific order when constructing the string to hash. This library handles this complexity for you, ensuring that parameters are ordered correctly for authentication.
 
 ## Usage
 
-### Basic Usage
+### Marketplace API Usage
 
 ```python
 from oneworldsync import OneWorldSyncClient
@@ -109,7 +117,49 @@ if results.products:
     print(f"Description: {product.description}")
 ```
 
-### Enhanced Data Access
+### Content1 API Usage
+
+```python
+from oneworldsync import Content1Client
+import os
+import json
+from dotenv import load_dotenv
+
+# Load credentials from .env file
+load_dotenv()
+app_id = os.getenv("ONEWORLDSYNC_APP_ID")
+secret_key = os.getenv("ONEWORLDSYNC_SECRET_KEY")
+gln = os.getenv("ONEWORLDSYNC_USER_GLN")
+
+# Initialize Content1 client
+client = Content1Client(app_id, secret_key, gln)
+
+# Count products
+count = client.count_products()
+print(f"Total products: {count}")
+
+# Fetch products with criteria
+criteria = {
+    "targetMarket": "US",
+    "lastModifiedDate": {
+        "from": {
+            "date": "2023-01-01",
+            "op": "GTE"
+        },
+        "to": {
+            "date": "2023-12-31",
+            "op": "LTE"
+        }
+    }
+}
+products = client.fetch_products(criteria, page_size=10)
+
+# Save the raw product details to a file for inspection
+with open("content1_products.json", "w") as f:
+    json.dump(products, f, indent=2)
+```
+
+### Enhanced Data Access (Marketplace API)
 
 ```python
 # Search for products
@@ -131,7 +181,7 @@ for product in results:
 results_dict = results.to_dict()
 ```
 
-### Advanced Search
+### Advanced Search (Marketplace API)
 
 ```python
 # Search for a product by UPC
@@ -144,7 +194,7 @@ results = client.free_text_search(
 )
 ```
 
-### Working with Products
+### Working with Products (Marketplace API)
 
 ```python
 # Get a specific product by ID
@@ -169,14 +219,39 @@ for product in results.products:
         print(f"Image URL: {image['url']} (Primary: {image['is_primary']})")
 ```
 
+### Content1 API - Fetching Products
+
+```python
+# Fetch products by GTIN
+gtins = ["00000000000000"]  # Replace with actual GTINs
+products = client.fetch_products_by_gtin(gtins)
+
+# Fetch products by Information Provider GLN
+ip_gln = "0838016005012"  # Replace with actual GLN
+products = client.fetch_products_by_ip_gln(ip_gln)
+
+# Fetch products by target market
+target_market = "US"
+products = client.fetch_products_by_target_market(target_market)
+
+# Fetch next page of products
+if "searchAfter" in products:
+    next_page = client.fetch_next_page(products)
+```
+
 ## Error Handling
 
 ```python
-from oneworldsync import OneWorldSyncClient, AuthenticationError, APIError
+from oneworldsync import OneWorldSyncClient, Content1Client, AuthenticationError, APIError
 
 try:
-    client = OneWorldSyncClient(app_id, secret_key)
-    results = client.free_text_search("apple")
+    # For Marketplace API
+    marketplace_client = OneWorldSyncClient(app_id, secret_key)
+    results = marketplace_client.free_text_search("apple")
+    
+    # For Content1 API
+    content1_client = Content1Client(app_id, secret_key)
+    products = content1_client.count_products()
 except AuthenticationError as e:
     print(f"Authentication failed: {e}")
 except APIError as e:
