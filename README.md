@@ -8,13 +8,27 @@ A Python client for interacting with the 1WorldSync Content1 API.
 pip install oneworldsync
 ```
 
-## Features
+## Key Features
 
 - Authentication with HMAC
 - Product fetching by GTIN, GLN, or target market
 - Product hierarchy retrieval
 - Pagination support
 - Comprehensive error handling
+- Content1-specific data models
+- OpenAPI 3.0.1 specification support
+
+## Package Structure
+
+```
+oneworldsync/
+├── __init__.py           # Package initialization and version
+├── content1_client.py    # Main Content1 API client
+├── content1_auth.py      # HMAC authentication for Content1 API
+├── models.py             # Data models for API responses
+├── exceptions.py         # Custom exceptions
+└── utils.py              # Utility functions
+```
 
 ## Quick Start
 
