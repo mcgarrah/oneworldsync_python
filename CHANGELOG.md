@@ -6,10 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Completely migrate from READ v1 to READ v2 of the REST API
-  - This involves migration from marketplace.1worldsync.com to content1-api.1worldsync.com
-  - HMAC remains the same for now
-  - v0.2.0 will be a complete rewrite to the new REST API endpoint
+
+## [0.2.1] - 2025-05-20
+
+### Changed
+- Complete migration from marketplace API to Content1 API
+- Removed legacy marketplace API client and authentication
+- Updated all documentation to focus on Content1 API
+- Replaced legacy models with Content1-specific models
+- Removed legacy example files
+
+### Added
+- New Content1-specific model classes: Content1Product, Content1ProductResults, Content1Hierarchy, Content1HierarchyResults
+- OpenAPI 3.0.1 specification documentation
+- Enhanced examples for Content1 API usage
 
 ## [0.1.8] - 2025-05-13
 

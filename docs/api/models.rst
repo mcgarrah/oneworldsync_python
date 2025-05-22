@@ -3,18 +3,32 @@ Models API
 
 .. module:: oneworldsync.models
 
-The models module provides data models for the 1WorldSync API responses.
+The models module provides data models for the 1WorldSync Content1 API responses.
 
-Product
-------
+Content1Product
+------------
 
-.. autoclass:: Product
+.. autoclass:: Content1Product
    :members:
    :special-members: __init__
 
-SearchResults
------------
+Content1ProductResults
+------------------
 
-.. autoclass:: SearchResults
+.. autoclass:: Content1ProductResults
    :members:
-   :special-members: __init__, __len__, __iter__, __getitem__
+   :special-members: __init__
+
+Content1Hierarchy
+-------------
+
+.. autoclass:: Content1Hierarchy
+   :members:
+   :special-members: __init__
+
+Content1HierarchyResults
+--------------------
+
+.. autoclass:: Content1HierarchyResults
+   :members:
+   :special-members: __init__

@@ -1,7 +1,7 @@
-OneWorldSync Python Client
-========================
+OneWorldSync Content1 API Python Client
+=================================
 
-A Python Client library module for accessing the 1WorldSync Content1 Search and Fetch REST API.
+A Python Client library module for accessing the 1WorldSync Content1 API.
 
 .. image:: https://readthedocs.org/projects/oneworldsync-python/badge/?version=latest
    :target: https://oneworldsync-python.readthedocs.io/en/latest/?badge=latest
@@ -55,13 +55,14 @@ Contents
    user/quickstart
    user/advanced_usage
    user/error_handling
+   openapi
 
 .. toctree::
    :maxdepth: 2
    :caption: API Reference
 
-   api/client
-   api/auth
+   api/content1_client
+   api/content1_auth
    api/models
    api/exceptions
    api/utils

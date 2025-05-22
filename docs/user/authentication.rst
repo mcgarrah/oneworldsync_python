@@ -1,83 +1,89 @@
 Authentication
-=============
+==============
 
-The 1WorldSync API uses HMAC authentication. You'll need an App ID and Secret Key from 1WorldSync to authenticate your requests.
+This guide explains how to authenticate with the 1WorldSync Content1 API.
 
-Obtaining Credentials
--------------------
+Authentication Credentials
+-----------------------
 
-To obtain credentials for the 1WorldSync API:
+To use the 1WorldSync Content1 API, you need the following credentials:
 
-1. Contact 1WorldSync to request API access
-2. You will receive an App ID and Secret Key
-3. These credentials are specific to either the production or preprod environment
+1. **App ID**: Your application identifier provided by 1WorldSync
+2. **Secret Key**: Your secret key provided by 1WorldSync
+3. **GLN** (optional): Global Location Number for the user
 
-Storing Credentials
------------------
+Setting Up Authentication
+----------------------
 
-You can store your credentials in a ``.env`` file:
+There are two ways to set up authentication:
 
-.. code-block:: ini
+1. **Direct initialization**:
 
-   ONEWORLDSYNC_APP_ID=your_app_id
-   ONEWORLDSYNC_SECRET_KEY=your_secret_key
-   ONEWORLDSYNC_API_URL=1ws_api_endpoint
+   .. code-block:: python
 
-Then load them in your code:
+      from oneworldsync import Content1Client
+      
+      client = Content1Client(
+          app_id='your_app_id',
+          secret_key='your_secret_key',
+          gln='your_gln'  # Optional
+      )
 
-.. code-block:: python
+2. **Environment variables**:
 
-   import os
-   from dotenv import load_dotenv
-   
-   # Load credentials from .env file
-   load_dotenv()
-   app_id = os.getenv("ONEWORLDSYNC_APP_ID")
-   secret_key = os.getenv("ONEWORLDSYNC_SECRET_KEY")
+   Set the following environment variables:
 
-Authentication Process
---------------------
+   .. code-block:: bash
 
-The 1WorldSync API requires a specific HMAC authentication process:
+      ONEWORLDSYNC_APP_ID=your_app_id
+      ONEWORLDSYNC_SECRET_KEY=your_secret_key
+      ONEWORLDSYNC_USER_GLN=your_gln  # Optional
+      ONEWORLDSYNC_CONTENT1_API_URL=https://content1-api.1worldsync.com  # Optional
 
-1. The client constructs a string containing the request parameters in a specific order
-2. The string is hashed using HMAC-SHA256 with the secret key
-3. The hash is base64-encoded and included in the request as the ``hash_code`` parameter
+   Then initialize the client without parameters:
 
-**Important Note**: The 1WorldSync API is very particular about the order of parameters in the authentication process. The parameters must be in a specific order when constructing the string to hash. This library handles this complexity for you, ensuring that parameters are ordered correctly for authentication.
+   .. code-block:: python
 
-Using the Client
+      from oneworldsync import Content1Client
+      
+      client = Content1Client()
+
+Using a .env File
 --------------
 
-The OneWorldSyncClient handles authentication automatically:
+For development, you can use a `.env` file to store your credentials:
 
-.. code-block:: python
+1. Create a `.env` file in your project directory:
 
-   from oneworldsync import OneWorldSyncClient
-   
-   # Initialize client with credentials
-   client = OneWorldSyncClient(app_id, secret_key)
-   
-   # All API calls will be automatically authenticated
-   results = client.free_text_search("milk")
+   .. code-block:: bash
 
-Authentication Errors
--------------------
+      ONEWORLDSYNC_APP_ID=your_app_id
+      ONEWORLDSYNC_SECRET_KEY=your_secret_key
+      ONEWORLDSYNC_USER_GLN=your_gln
+      ONEWORLDSYNC_CONTENT1_API_URL=https://content1-api.1worldsync.com
 
-If authentication fails, an ``AuthenticationError`` will be raised:
+2. Load the environment variables using the `python-dotenv` package:
 
-.. code-block:: python
+   .. code-block:: python
 
-   from oneworldsync import OneWorldSyncClient, AuthenticationError
-   
-   try:
-       client = OneWorldSyncClient(app_id, secret_key)
-       results = client.free_text_search("milk")
-   except AuthenticationError as e:
-       print(f"Authentication failed: {e}")
+      import os
+      from dotenv import load_dotenv
+      from oneworldsync import Content1Client
+      
+      # Load environment variables from .env file
+      load_dotenv()
+      
+      # Initialize client using environment variables
+      client = Content1Client()
 
-Common authentication issues include:
+Authentication Process
+------------------
 
-1. Incorrect App ID or Secret Key
-2. Using credentials for the wrong environment (production vs. preprod)
-3. System clock not synchronized (timestamp accuracy is important for authentication)
+The 1WorldSync Content1 API uses HMAC authentication. The client handles this process automatically:
+
+1. The client generates a timestamp for the request
+2. The client constructs the URI with the timestamp
+3. The client generates a hash code using the secret key and URI
+4. The client adds the app ID, hash code, and GLN (if provided) to the request headers
+
+For more details on the HMAC authentication process, refer to the 1WorldSync Content1 API HMAC Guide.
