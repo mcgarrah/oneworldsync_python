@@ -1,5 +1,5 @@
 """
-Utility functions for the 1WorldSync API client
+Utility functions for the 1WorldSync Content1 API client
 """
 
 import json

@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-05-20
+
+### Changed
+- Complete migration from marketplace API to Content1 API
+- Removed legacy marketplace API client and authentication
+- Updated all documentation to focus on Content1 API
+- Replaced legacy models with Content1-specific models
+- Removed legacy example files
+
+### Added
+- New Content1-specific model classes: Content1Product, Content1ProductResults, Content1Hierarchy, Content1HierarchyResults
+- OpenAPI 3.0.1 specification documentation
+- Enhanced examples for Content1 API usage
+
 ## [0.1.8] - 2025-05-13
 
 ### Added

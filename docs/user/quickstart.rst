@@ -1,7 +1,7 @@
 Quickstart
 ==========
 
-This guide will help you get started with the OneWorldSync Python Client.
+This guide will help you get started with the 1WorldSync Content1 API Python Client.
 
 Basic Setup
 ----------
@@ -10,7 +10,7 @@ First, import the client and initialize it with your credentials:
 
 .. code-block:: python
 
-   from oneworldsync import OneWorldSyncClient
+   from oneworldsync import Content1Client
    import os
    from dotenv import load_dotenv
    
@@ -18,109 +18,134 @@ First, import the client and initialize it with your credentials:
    load_dotenv()
    app_id = os.getenv("ONEWORLDSYNC_APP_ID")
    secret_key = os.getenv("ONEWORLDSYNC_SECRET_KEY")
+   gln = os.getenv("ONEWORLDSYNC_USER_GLN")  # Optional
    
    # Initialize client
-   client = OneWorldSyncClient(app_id, secret_key)
+   client = Content1Client(app_id, secret_key, gln)
 
-Free Text Search
+Counting Products
 --------------
 
-Perform a simple free text search:
+Count the number of products available:
 
 .. code-block:: python
 
-   # Search for products containing "milk"
-   results = client.free_text_search("milk")
+   # Count all products
+   count = client.count_products()
+   print(f"Total products: {count}")
    
-   # Print number of results
-   print(f"Found {len(results.products)} products")
-   
-   # Print details of the first product
-   if results.products:
-       product = results.products[0]
-       print(f"Product: {product.brand_name} - {product.product_name}")
-       print(f"Description: {product.description}")
+   # Count products with criteria
+   criteria = {
+       "targetMarket": "US"
+   }
+   count = client.count_products(criteria)
+   print(f"US products: {count}")
 
-Advanced Search
+Fetching Products
 -------------
 
-Search for a product by a specific field:
+Fetch products with various criteria:
 
 .. code-block:: python
 
-   # Search for a product by UPC
-   results = client.advanced_search("itemIdentifier", "16241419122223")
+   # Fetch products by GTIN
+   products = client.fetch_products_by_gtin(["00000000000000"])
    
-   # Search for products by brand
-   results = client.advanced_search("brandName", "Organic Valley")
+   # Fetch products by Information Provider GLN
+   products = client.fetch_products_by_ip_gln("1234567890123")
+   
+   # Fetch products by target market
+   products = client.fetch_products_by_target_market("US")
 
-Geo-Location Search
+Advanced Fetching
 -----------------
 
-Search for products with geo-location context:
+Use more complex criteria for fetching products:
 
 .. code-block:: python
 
-   # Search with geo location (San Francisco coordinates)
-   results = client.free_text_search(
-       "coffee",
-       geo_location=(37.7749, -122.4194)
-   )
-
-Working with Search Results
--------------------------
-
-Iterate through search results:
-
-.. code-block:: python
-
-   # Iterate through products
-   for product in results:
-       print(f"ID: {product.item_id}")
-       print(f"Brand: {product.brand_name}")
-       print(f"Name: {product.product_name}")
-       print(f"Description: {product.description}")
-       
-       # Get product dimensions
-       print(f"Dimensions: {product.formatted_dimensions}")
-       
-       # Get primary image
-       print(f"Primary Image: {product.primary_image_url}")
-       
-       # Get all product images
-       for image in product.images:
-           print(f"Image URL: {image['url']} (Primary: {image['is_primary']})")
-
-Fetching a Specific Product
--------------------------
-
-Get a specific product by ID:
-
-.. code-block:: python
-
-   # Get a product by ID
-   product_data = client.get_product("some_product_id")
+   # Create criteria with field selection and sorting
+   criteria = {
+       "targetMarket": "US",
+       "fields": {
+           "include": [
+               "gtin", 
+               "informationProviderGLN", 
+               "targetMarket",
+               "brandName", 
+               "gpcCategory"
+           ]
+       },
+       "sortFields": [
+           {
+               "field": "lastModifiedDate",
+               "desc": True
+           }
+       ]
+   }
    
-   # Process the product data
-   # Note: This returns the raw API response, not a Product object
+   # Fetch products with page size
+   products = client.fetch_products(criteria, page_size=100)
 
-Converting to Dictionaries
+Working with Pagination
+-------------------------
+
+Handle pagination for large result sets:
+
+.. code-block:: python
+
+   # Fetch first page
+   products = client.fetch_products(criteria, page_size=100)
+   
+   # Process first page
+   for item in products.get("items", []):
+       print(f"GTIN: {item.get('gtin')}")
+   
+   # Check if there are more pages
+   if "searchAfter" in products:
+       # Create criteria for next page
+       next_page_criteria = criteria.copy()
+       next_page_criteria["searchAfter"] = products["searchAfter"]
+       
+       # Fetch next page
+       next_page = client.fetch_products(next_page_criteria, page_size=100)
+
+Fetching Product Hierarchies
+-------------------------
+
+Get product hierarchy information:
+
+.. code-block:: python
+
+   # Fetch hierarchies
+   hierarchies = client.fetch_hierarchies()
+   
+   # Process hierarchies
+   for hierarchy in hierarchies.get("hierarchies", []):
+       print(f"GTIN: {hierarchy.get('gtin')}")
+       print(f"Target Market: {hierarchy.get('targetMarket')}")
+       
+       # Process hierarchy structure
+       for level in hierarchy.get("hierarchy", []):
+           print(f"Parent GTIN: {level.get('parentGtin')}")
+           print(f"Child GTIN: {level.get('gtin')}")
+           print(f"Quantity: {level.get('quantity')}")
+
+Error Handling
 ------------------------
 
-Convert products and search results to dictionaries for easier handling:
+Handle errors properly:
 
 .. code-block:: python
 
-   # Convert a product to a dictionary
-   product_dict = product.to_dict()
+   from oneworldsync import Content1Client, AuthenticationError, APIError
    
-   # Convert entire search results to a dictionary
-   results_dict = results.to_dict()
-   
-   # Access metadata
-   metadata = results_dict['metadata']
-   print(f"Total results: {metadata['total_results']}")
-   
-   # Access products
-   for p in results_dict['products']:
-       print(f"{p['brand_name']} - {p['product_name']}")
+   try:
+       products = client.fetch_products(criteria)
+   except AuthenticationError as e:
+       print(f"Authentication failed: {e}")
+   except APIError as e:
+       print(f"API error: {e}")
+       print(f"Status code: {e.status_code}")
+   except Exception as e:
+       print(f"Unexpected error: {e}")

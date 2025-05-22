@@ -1,5 +1,5 @@
 """
-Pytest configuration for 1WorldSync tests
+Pytest configuration for 1WorldSync Content1 API tests
 """
 
 import os
@@ -8,150 +8,79 @@ from unittest.mock import patch
 
 
 @pytest.fixture
-def mock_credentials():
-    """Fixture to provide mock credentials for testing"""
+def mock_content1_credentials():
+    """Fixture to provide mock Content1 API credentials for testing"""
     return {
         'app_id': 'test_app_id',
         'secret_key': 'test_secret_key',
-        'api_url': 'test.api.1worldsync.com'
+        'gln': 'test_gln',
+        'api_url': 'https://test.content1-api.1worldsync.com'
     }
 
 
 @pytest.fixture
-def mock_env_credentials(monkeypatch):
-    """Fixture to mock environment variables for credentials"""
+def mock_content1_env_credentials(monkeypatch):
+    """Fixture to mock environment variables for Content1 API credentials"""
     monkeypatch.setenv('ONEWORLDSYNC_APP_ID', 'env_app_id')
     monkeypatch.setenv('ONEWORLDSYNC_SECRET_KEY', 'env_secret_key')
-    monkeypatch.setenv('ONEWORLDSYNC_API_URL', 'env.api.1worldsync.com')
+    monkeypatch.setenv('ONEWORLDSYNC_USER_GLN', 'env_gln')
+    monkeypatch.setenv('ONEWORLDSYNC_CONTENT1_API_URL', 'https://env.content1-api.1worldsync.com')
 
 
 @pytest.fixture
-def mock_response():
-    """Fixture to provide a mock API response"""
+def mock_content1_response():
+    """Fixture to provide a mock Content1 API response"""
     return {
-        'responseCode': '0',
-        'responseMessage': 'Success',
-        'totalNumOfResults': '2',
-        'nextCursorMark': 'cursor123',
-        'results': [
+        'items': [
             {
+                'gtin': '00000000000001',
+                'informationProviderGLN': '1234567890123',
+                'targetMarket': 'US',
+                'lastModifiedDate': '2023-01-01T12:00:00Z',
                 'item': {
-                    'itemIdentificationInformation': {
-                        'itemIdentifier': [
-                            {
-                                'isPrimary': 'true',
-                                'itemId': 'item123'
-                            }
-                        ]
-                    },
-                    'tradeItemInformation': [
-                        {
-                            'tradeItemDescriptionModule': {
-                                'tradeItemDescriptionInformation': [
-                                    {
-                                        'brandNameInformation': {
-                                            'brandName': 'Test Brand'
-                                        },
-                                        'regulatedProductName': [
-                                            {
-                                                'statement': {
-                                                    'values': [
-                                                        {
-                                                            'value': 'Test Product'
-                                                        }
-                                                    ]
-                                                }
-                                            }
-                                        ],
-                                        'additionalTradeItemDescription': {
-                                            'values': [
-                                                {
-                                                    'value': 'Test Description'
-                                                }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            },
-                            'referencedFileDetailInformationModule': {
-                                'referencedFileHeader': [
-                                    {
-                                        'referencedFileTypeCode': {
-                                            'value': 'PRODUCT_IMAGE'
-                                        },
-                                        'uniformResourceIdentifier': 'https://example.com/image.jpg',
-                                        'isPrimaryFile': {
-                                            'value': 'true'
-                                        }
-                                    }
-                                ]
-                            },
-                            'tradeItemMeasurementsModuleGroup': [
-                                {
-                                    'tradeItemMeasurementsModule': {
-                                        'tradeItemMeasurements': {
-                                            'height': {
-                                                'value': '10',
-                                                'qual': 'CM'
-                                            },
-                                            'width': {
-                                                'value': '20',
-                                                'qual': 'CM'
-                                            },
-                                            'depth': {
-                                                'value': '30',
-                                                'qual': 'CM'
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    ]
+                    'brandName': 'Test Brand',
+                    'gpcCategory': '10000000'
                 }
             },
             {
+                'gtin': '00000000000002',
+                'informationProviderGLN': '1234567890123',
+                'targetMarket': 'US',
+                'lastModifiedDate': '2023-01-02T12:00:00Z',
                 'item': {
-                    'itemIdentificationInformation': {
-                        'itemIdentifier': [
-                            {
-                                'isPrimary': 'true',
-                                'itemId': 'item456'
-                            }
-                        ]
-                    },
-                    'tradeItemInformation': [
-                        {
-                            'tradeItemDescriptionModule': {
-                                'tradeItemDescriptionInformation': [
-                                    {
-                                        'brandNameInformation': {
-                                            'brandName': 'Another Brand'
-                                        },
-                                        'regulatedProductName': [
-                                            {
-                                                'statement': {
-                                                    'values': [
-                                                        {
-                                                            'value': 'Another Product'
-                                                        }
-                                                    ]
-                                                }
-                                            }
-                                        ],
-                                        'additionalTradeItemDescription': {
-                                            'values': [
-                                                {
-                                                    'value': 'Another Description'
-                                                }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    ]
+                    'brandName': 'Another Brand',
+                    'gpcCategory': '20000000'
                 }
             }
-        ]
+        ],
+        'searchAfter': 'next_page_token'
+    }
+
+
+@pytest.fixture
+def mock_content1_hierarchy_response():
+    """Fixture to provide a mock Content1 API hierarchy response"""
+    return {
+        'hierarchies': [
+            {
+                'gtin': '00000000000001',
+                'informationProviderGLN': '1234567890123',
+                'targetMarket': 'US',
+                'hierarchy': [
+                    {
+                        'parentGtin': '00000000000001',
+                        'gtin': '00000000000002',
+                        'quantity': 2,
+                        'children': [
+                            {
+                                'parentGtin': '00000000000002',
+                                'gtin': '00000000000003',
+                                'quantity': 3
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        'searchAfter': 'next_hierarchy_token'
     }

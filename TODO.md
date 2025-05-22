@@ -19,4 +19,6 @@
   - [ ] add a `pytest` github action to test a matrix of python versions
   - [ ] add a python `linter` github action to review code
   - [ ] review existing PyPi to add the tagging and release `gh release ...`
+- [ ] Update to the Content1 API (content1-api.1worldsync.com)
+- [ ] Remove the Marketplace API (marketplace.1worldsync.com)
 - [ ] Examples of useful search and fetch for a webapp

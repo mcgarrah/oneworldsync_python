@@ -1,157 +1,214 @@
 Advanced Usage
 =============
 
-This guide covers advanced usage of the OneWorldSync Python Client.
+This guide covers advanced usage of the 1WorldSync Content1 API Python Client.
 
-Advanced Search Options
----------------------
+Date Range Queries
+----------------
 
-The advanced search functionality allows you to search for products using specific fields:
-
-.. code-block:: python
-
-   # Search by GTIN
-   results = client.advanced_search("gtin", "12345678901234")
-   
-   # Search by brand name
-   results = client.advanced_search("brandName", "Organic Valley")
-   
-   # Search by product name
-   results = client.advanced_search("productName", "Whole Milk")
-
-You can also add additional parameters to refine your search:
+Create date range criteria for filtering products:
 
 .. code-block:: python
 
-   # Limit the number of results
-   results = client.advanced_search("brandName", "Organic", limit=5)
+   import datetime
    
-   # Sort results
-   results = client.advanced_search("productName", "Milk", sort="relevance")
-
-Pagination
----------
-
-When dealing with large result sets, you can use pagination:
-
-.. code-block:: python
-
-   # Get the first page of results
-   results = client.free_text_search("milk", limit=10)
+   # Get current date and 30 days ago
+   today = datetime.datetime.now()
+   thirty_days_ago = today - datetime.timedelta(days=30)
    
-   # Get the next cursor from the results
-   next_cursor = results.next_cursor
+   # Create date range criteria
+   date_criteria = {
+       "lastModifiedDate": {
+           "from": {
+               "date": thirty_days_ago.strftime("%Y-%m-%d"),
+               "op": "GTE"
+           },
+           "to": {
+               "date": today.strftime("%Y-%m-%d"),
+               "op": "LTE"
+           }
+       }
+   }
    
-   # If there's a next cursor, get the next page
-   if next_cursor:
-       next_page = client.free_text_search("milk", limit=10, cursor=next_cursor)
+   # Use in a query
+   products = client.fetch_products(date_criteria)
 
-Geo-Location Search
------------------
-
-You can include geo-location information in your searches:
-
-.. code-block:: python
-
-   # Search with geo-location (latitude, longitude)
-   results = client.free_text_search(
-       "coffee",
-       geo_location=(37.7749, -122.4194)  # San Francisco coordinates
-   )
-
-Custom API URL
-------------
-
-If you need to use a different API URL (e.g., for testing or preprod):
-
-.. code-block:: python
-
-   # Use a custom API URL
-   client = OneWorldSyncClient(
-       app_id="your_app_id",
-       secret_key="your_secret_key",
-       api_url="preprod.api.1worldsync.com"
-   )
-
-Request Timeout
+Field Selection
 -------------
 
-You can customize the request timeout:
+Select specific fields to include in the response:
 
 .. code-block:: python
 
-   # Set a custom timeout (in seconds)
-   client = OneWorldSyncClient(
-       app_id="your_app_id",
-       secret_key="your_secret_key",
-       timeout=60  # 60 seconds
-   )
-
-Enhanced Product Data Access
---------------------------
-
-The Product class provides enhanced properties for easier access to product data:
-
-.. code-block:: python
-
-   # Get a product from search results
-   product = results.products[0]
+   # Create criteria with field selection
+   criteria = {
+       "fields": {
+           "include": [
+               "gtin",
+               "informationProviderGLN",
+               "targetMarket",
+               "lastModifiedDate",
+               "brandName",
+               "gpcCategory"
+           ]
+       }
+   }
    
-   # Access basic information
-   print(f"ID: {product.item_id}")
-   print(f"GTIN: {product.gtin}")
-   print(f"Brand: {product.brand_name}")
-   print(f"Name: {product.product_name}")
-   print(f"Description: {product.description}")
-   
-   # Access primary image URL directly
-   print(f"Primary Image: {product.primary_image_url}")
-   
-   # Get formatted dimensions as a string
-   print(f"Dimensions: {product.formatted_dimensions}")
-   
-   # Access additional product information
-   print(f"GPC Code: {product.gpc_code}")
-   print(f"Category: {product.category}")
-   print(f"Country of Origin: {product.country_of_origin}")
-   print(f"Ingredients: {product.ingredients}")
-   
-   # Access all images
-   for image in product.images:
-       print(f"Image URL: {image['url']}")
-       print(f"Is Primary: {image['is_primary']}")
+   # Fetch products with selected fields
+   products = client.fetch_products(criteria)
 
-Converting to Dictionaries
-------------------------
-
-You can convert products and search results to clean dictionaries:
-
-.. code-block:: python
-
-   # Convert a product to a dictionary
-   product_dict = product.to_dict()
-   
-   # Convert entire search results to a dictionary
-   results_dict = results.to_dict()
-   
-   # Access metadata from the dictionary
-   metadata = results_dict['metadata']
-   print(f"Total results: {metadata['total_results']}")
-   
-   # Access products from the dictionary
-   products = results_dict['products']
-   for p in products:
-       print(f"{p['brand_name']} - {p['product_name']}")
-
-Raw Data Access
+Sorting Results
 ------------
 
-You can still access the raw data directly if needed:
+Sort results by one or more fields:
 
 .. code-block:: python
 
-   # Access the raw data
-   raw_data = product.data
+   # Create criteria with sorting
+   criteria = {
+       "sortFields": [
+           {
+               "field": "lastModifiedDate",
+               "desc": True  # Descending order
+           },
+           {
+               "field": "gtin",
+               "desc": False  # Ascending order
+           }
+       ]
+   }
    
-   # Access specific fields in the raw data
-   item = product.item
+   # Fetch sorted products
+   products = client.fetch_products(criteria)
+
+Combining Multiple Criteria
+------------------------
+
+Combine multiple criteria for complex queries:
+
+.. code-block:: python
+
+   # Create combined criteria
+   criteria = {
+       # Target market
+       "targetMarket": "US",
+       
+       # Date range
+       "lastModifiedDate": date_criteria["lastModifiedDate"],
+       
+       # Field selection
+       "fields": {
+           "include": [
+               "gtin",
+               "informationProviderGLN",
+               "targetMarket",
+               "lastModifiedDate",
+               "brandName",
+               "gpcCategory"
+           ]
+       },
+       
+       # Sorting
+       "sortFields": [
+           {
+               "field": "lastModifiedDate",
+               "desc": True
+           }
+       ]
+   }
+   
+   # Fetch products with combined criteria
+   products = client.fetch_products(criteria)
+
+Efficient Pagination
+-----------------
+
+Efficiently paginate through large result sets:
+
+.. code-block:: python
+
+   # Function to process all pages
+   def process_all_pages(criteria, page_size=100):
+       # Fetch first page
+       current_page = client.fetch_products(criteria, page_size=page_size)
+       
+       # Process items from first page
+       process_items(current_page.get("items", []))
+       
+       # Continue fetching pages until no more results
+       while "searchAfter" in current_page:
+           # Update criteria for next page
+           next_criteria = criteria.copy()
+           next_criteria["searchAfter"] = current_page["searchAfter"]
+           
+           # Fetch next page
+           current_page = client.fetch_products(next_criteria, page_size=page_size)
+           
+           # Process items from current page
+           process_items(current_page.get("items", []))
+   
+   # Function to process items
+   def process_items(items):
+       for item in items:
+           # Process each item
+           print(f"Processing GTIN: {item.get('gtin')}")
+   
+   # Use the function
+   process_all_pages(criteria)
+
+Working with Hierarchies
+---------------------
+
+Advanced usage with product hierarchies:
+
+.. code-block:: python
+
+   # Fetch hierarchies with criteria
+   hierarchy_criteria = {
+       "targetMarket": "US",
+       "lastModifiedDate": date_criteria["lastModifiedDate"]
+   }
+   
+   hierarchies = client.fetch_hierarchies(hierarchy_criteria)
+   
+   # Process hierarchies
+   for hierarchy in hierarchies.get("hierarchies", []):
+       print(f"Processing hierarchy for GTIN: {hierarchy.get('gtin')}")
+       
+       # Process hierarchy structure
+       process_hierarchy_structure(hierarchy.get("hierarchy", []))
+   
+   # Function to recursively process hierarchy structure
+   def process_hierarchy_structure(structure, level=0):
+       for item in structure:
+           indent = "  " * level
+           print(f"{indent}Parent GTIN: {item.get('parentGtin')}")
+           print(f"{indent}GTIN: {item.get('gtin')}")
+           print(f"{indent}Quantity: {item.get('quantity')}")
+           
+           # Process children recursively
+           if "children" in item and item["children"]:
+               process_hierarchy_structure(item["children"], level + 1)
+
+Saving Results to Files
+--------------------
+
+Save API responses to files for later processing:
+
+.. code-block:: python
+
+   import json
+   
+   # Fetch products
+   products = client.fetch_products(criteria)
+   
+   # Save to file
+   with open("products.json", "w") as f:
+       json.dump(products, f, indent=2)
+   
+   # Fetch hierarchies
+   hierarchies = client.fetch_hierarchies(hierarchy_criteria)
+   
+   # Save to file
+   with open("hierarchies.json", "w") as f:
+       json.dump(hierarchies, f, indent=2)

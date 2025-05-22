@@ -1,41 +1,189 @@
-# 1WorldSync Content1 REST API
+# 1WorldSync API Documentation
 
-The following APIs are available:
+This document provides information about the 1WorldSync APIs supported by this client library.
 
-**Product Search API** - Performs a search against the product data published in ContentNOW to find products that meet the supplied criteria. For each search result displayed, a basic set of information about the product is provided. While performing a product search only a subset from the entire list of attributes for an item will be returned.
+## Supported APIs
 
-**Product Fetch API** - Once a Product Search has been performed, the full set of attribute information on a given product can be retrieved using the Product Fetch API and the item reference id (obtained through the search).
+This client library supports two main 1WorldSync APIs:
 
-You can access the [PreProd Swagger API interface](https://marketplace.preprod.api.1worldsync.com/api/V2/) to test things out.
+1. **Marketplace API** - Used for product search and retrieval
+2. **Content1 API** - Used for product count, fetch, and hierarchy operations
 
-Learning to perform queries has been challenging along the way.
+## Marketplace API
 
-- 1WorldSync Content1 REST API Product Search Parameters
-  - searchType: 
-    - `freeTextSearch`: When using the freeText search you would specify a word, phrase, or ID to search on.
-    - `categoryCode`: If a categoryCode search is selected the category code should be provided.
-    - `advancedSearch`: When advancedSearch is selected you can create a dynamic query using logical operators (and/or/not) along with a corresponding attribute to create a complex query.
-    - 1ws searchable [query attributes](https://marketplace.preprod.api.1worldsync.com/api/V2/SearchAttributes.htm)
-    - Examples:
-      - freeTextSearch - query="Tuscan milk"
-      - categoryCode - query="Fruits - Unprepared/Unprocessed(Frozen)"
-      - advancedSearch - query=productName:"Healthy and tastySoybeanmilk"
-      - To search for Beverages in a freeTextSearch:
-        - query="Bever＊"
-        - query="＊verag＊"
-        - query="＊erages"
-        - Note: For partial text search on a single word, append '＊' in the query parameter. You can not use a partial text search for a phrase.
-        - query="Tuscan mi＊" - is not valid
-  - filter: ???
-  - sortOrder: `asc`, `desc`
-  - sortColumn:
-    - 1ws [sort attributes](https://marketplace.preprod.api.1worldsync.com/api/V2/SortAttributes.htm)
-    - isTradeItemAConsumerUnit: True/ False - Indicates whether an item is a consumable unit or not.
-    - lastChangeDateTime: System generated time when the last change was made
-    - tradeItemUnitDescriptorCode: This field represents the type of the product that this item is.
-    - publicationDateTime: System generated time when publication occurred
-    - targetMarket: The Target Market indicates the country where the trade item is available for sale.
+The Marketplace API provides endpoints for searching and retrieving product information.
 
-- 1WorldSync Content1 REST API Product Fetch Parameters
-  - `attrset` [Attribute Context Lists](https://marketplace.preprod.api.1worldsync.com/api/V2/AttributeContextLists.htm)
-  - Example: `attrset=allergens,ingredients,nutritionals`
+### Key Endpoints
+
+- **Free Text Search** - Search for products using free text
+- **Advanced Search** - Search for products using specific fields
+- **Product Retrieval** - Get detailed information about a specific product
+
+### Authentication
+
+The Marketplace API uses HMAC authentication with the following parameters:
+
+- `app_id` - Your application ID
+- `hash_code` - HMAC-SHA256 hash of the request URI
+- `TIMESTAMP` - Current timestamp in ISO 8601 format
+
+## Content1 API
+
+The Content1 API provides endpoints for counting, fetching, and retrieving hierarchy information for products.
+
+### Key Endpoints
+
+- **Product Count** (`/V1/product/count`) - Count products matching specific criteria
+- **Product Fetch** (`/V1/product/fetch`) - Fetch products matching specific criteria
+- **Product Hierarchy** (`/V1/product/hierarchy`) - Fetch hierarchy information for products
+
+### Authentication
+
+The Content1 API uses HMAC authentication with the following headers:
+
+- `appId` - Your application ID
+- `hashcode` - HMAC-SHA256 hash of the request URI
+- `gln` (optional) - Your Global Location Number
+
+### Request Format
+
+#### Product Count Request
+
+```json
+POST /V1/product/count?timestamp=2023-02-28T13:37:59Z
+Headers:
+  appId: your_app_id
+  hashcode: generated_hash_code
+  gln: your_gln (optional)
+
+Body:
+{
+  "gtin": ["00000000000000"],
+  "ipGln": "0838016005012",
+  "targetMarket": "US",
+  "lastModifiedDate": {
+    "from": {
+      "date": "2023-01-01",
+      "op": "GTE"
+    },
+    "to": {
+      "date": "2023-12-31",
+      "op": "LTE"
+    }
+  }
+}
+```
+
+#### Product Fetch Request
+
+```json
+POST /V1/product/fetch?timestamp=2023-02-28T13:37:59Z&pageSize=1000
+Headers:
+  appId: your_app_id
+  hashcode: generated_hash_code
+  gln: your_gln (optional)
+
+Body:
+{
+  "gtin": ["00000000000000"],
+  "ipGln": "0838016005012",
+  "targetMarket": "US",
+  "lastModifiedDate": {
+    "from": {
+      "date": "2023-01-01",
+      "op": "GTE"
+    },
+    "to": {
+      "date": "2023-12-31",
+      "op": "LTE"
+    }
+  },
+  "fields": {
+    "include": [
+      "gtin",
+      "informationProviderGLN",
+      "targetMarket",
+      "lastModifiedDate",
+      "brandName",
+      "gpcCategory"
+    ]
+  }
+}
+```
+
+### Response Format
+
+#### Product Count Response
+
+```json
+{
+  "count": 1000
+}
+```
+
+#### Product Fetch Response
+
+```json
+{
+  "items": [
+    {
+      "gln": "0838016005012",
+      "dataPoolType": "SDP",
+      "item": {
+        // Product data
+      }
+    }
+  ],
+  "totalPages": 10,
+  "currentPage": 1,
+  "totalCount": 1000,
+  "searchAfter": ["00637827872406", "US"],
+  "message": "To retrieve the next page of products, pick what you have received in searchAfter and set it in next request."
+}
+```
+
+## Pagination
+
+The Content1 API uses cursor-based pagination with the `searchAfter` parameter. To retrieve the next page of results:
+
+1. Extract the `searchAfter` value from the response
+2. Include it in the next request's criteria
+
+Example:
+
+```python
+# First page
+response = client.fetch_products(criteria)
+
+# Get searchAfter value
+search_after = response.get("searchAfter")
+
+# Next page
+if search_after:
+    criteria["searchAfter"] = search_after
+    next_page = client.fetch_products(criteria)
+```
+
+## Error Handling
+
+The API may return various error codes:
+
+- **401** - Authentication error (invalid credentials)
+- **400** - Bad request (invalid parameters)
+- **500** - Internal server error
+
+Error responses include:
+
+```json
+{
+  "requestId": "12222",
+  "code": "REQUIRED_HEADER_APPID_MISSING",
+  "reason": "appId is missing in header"
+}
+```
+
+## References
+
+For more detailed information, refer to the official 1WorldSync API documentation:
+
+- Content1 API: https://content1-api.1worldsync.com/v3/api-docs

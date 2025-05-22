@@ -193,3 +193,6 @@ cython_debug/
 
 # PDFs
 docs/*.pdf
+
+# Root JSON files
+/*.json

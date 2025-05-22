@@ -3,125 +3,138 @@ Tests for the models module
 """
 
 import pytest
-from oneworldsync.models import Product, SearchResults
+from oneworldsync.models import Content1Product, Content1ProductResults, Content1Hierarchy, Content1HierarchyResults
 
 
-def test_product_init(mock_response):
-    """Test Product initialization"""
-    product_data = mock_response['results'][0]
-    product = Product(product_data)
+def test_content1_product_init():
+    """Test Content1Product initialization"""
+    data = {
+        'gtin': '00000000000001',
+        'informationProviderGLN': '1234567890123',
+        'targetMarket': 'US',
+        'lastModifiedDate': '2023-01-01T12:00:00Z',
+        'item': {
+            'brandName': 'Test Brand',
+            'gpcCategory': '10000000'
+        }
+    }
     
-    assert product.data == product_data
-    assert product.item == product_data['item']
-
-
-def test_product_item_id(mock_response):
-    """Test Product.item_id property"""
-    product = Product(mock_response['results'][0])
-    assert product.item_id == 'item123'
-
-
-def test_product_brand_name(mock_response):
-    """Test Product.brand_name property"""
-    product = Product(mock_response['results'][0])
+    product = Content1Product(data)
+    
+    assert product.gtin == '00000000000001'
+    assert product.information_provider_gln == '1234567890123'
+    assert product.target_market == 'US'
+    assert product.last_modified_date == '2023-01-01T12:00:00Z'
     assert product.brand_name == 'Test Brand'
+    assert product.gpc_category == '10000000'
 
 
-def test_product_product_name(mock_response):
-    """Test Product.product_name property"""
-    product = Product(mock_response['results'][0])
-    assert product.product_name == 'Test Product'
-
-
-def test_product_description(mock_response):
-    """Test Product.description property"""
-    product = Product(mock_response['results'][0])
-    assert product.description == 'Test Description'
-
-
-def test_product_images(mock_response):
-    """Test Product.images property"""
-    product = Product(mock_response['results'][0])
-    images = product.images
+def test_content1_product_to_dict():
+    """Test Content1Product to_dict method"""
+    data = {
+        'gtin': '00000000000001',
+        'informationProviderGLN': '1234567890123',
+        'targetMarket': 'US',
+        'lastModifiedDate': '2023-01-01T12:00:00Z',
+        'item': {
+            'brandName': 'Test Brand',
+            'gpcCategory': '10000000'
+        }
+    }
     
-    assert len(images) == 1
-    assert images[0]['url'] == 'https://example.com/image.jpg'
-    assert images[0]['is_primary'] is True
-
-
-def test_product_dimensions(mock_response):
-    """Test Product.dimensions property"""
-    product = Product(mock_response['results'][0])
-    dimensions = product.dimensions
+    product = Content1Product(data)
+    product_dict = product.to_dict()
     
-    assert dimensions['height']['value'] == '10'
-    assert dimensions['height']['unit'] == 'CM'
-    assert dimensions['width']['value'] == '20'
-    assert dimensions['width']['unit'] == 'CM'
-    assert dimensions['depth']['value'] == '30'
-    assert dimensions['depth']['unit'] == 'CM'
+    assert product_dict['gtin'] == '00000000000001'
+    assert product_dict['information_provider_gln'] == '1234567890123'
+    assert product_dict['target_market'] == 'US'
+    assert product_dict['last_modified_date'] == '2023-01-01T12:00:00Z'
+    assert product_dict['brand_name'] == 'Test Brand'
+    assert product_dict['gpc_category'] == '10000000'
 
 
-def test_product_str(mock_response):
-    """Test Product.__str__ method"""
-    product = Product(mock_response['results'][0])
-    assert str(product) == 'Test Brand - Test Product (item123)'
-
-
-def test_product_missing_data():
-    """Test Product with missing data"""
-    product = Product({'item': {}})
+def test_content1_product_results_init(mock_content1_response):
+    """Test Content1ProductResults initialization"""
+    results = Content1ProductResults(mock_content1_response)
     
-    assert product.item_id is None
-    assert product.brand_name is None
-    assert product.product_name is None
-    assert product.description is None
-    assert product.images == []
-    assert product.dimensions == {}
-
-
-def test_search_results_init(mock_response):
-    """Test SearchResults initialization"""
-    results = SearchResults(mock_response)
-    
-    assert results.data == mock_response
-    assert results.response_code == '0'
-    assert results.response_message == 'Success'
-    assert results.total_results == 2
-    assert results.next_cursor == 'cursor123'
+    assert results.search_after == 'next_page_token'
     assert len(results.products) == 2
+    assert isinstance(results.products[0], Content1Product)
+    assert results.products[0].gtin == '00000000000001'
+    assert results.products[1].gtin == '00000000000002'
 
 
-def test_search_results_len(mock_response):
-    """Test SearchResults.__len__ method"""
-    results = SearchResults(mock_response)
-    assert len(results) == 2
-
-
-def test_search_results_iter(mock_response):
-    """Test SearchResults.__iter__ method"""
-    results = SearchResults(mock_response)
+def test_content1_product_results_iteration(mock_content1_response):
+    """Test Content1ProductResults iteration"""
+    results = Content1ProductResults(mock_content1_response)
+    
     products = list(results)
-    
     assert len(products) == 2
-    assert products[0].item_id == 'item123'
-    assert products[1].item_id == 'item456'
+    assert products[0].gtin == '00000000000001'
+    assert products[1].gtin == '00000000000002'
 
 
-def test_search_results_getitem(mock_response):
-    """Test SearchResults.__getitem__ method"""
-    results = SearchResults(mock_response)
+def test_content1_product_results_indexing(mock_content1_response):
+    """Test Content1ProductResults indexing"""
+    results = Content1ProductResults(mock_content1_response)
     
-    assert results[0].item_id == 'item123'
-    assert results[1].item_id == 'item456'
+    assert results[0].gtin == '00000000000001'
+    assert results[1].gtin == '00000000000002'
 
 
-def test_search_results_empty():
-    """Test SearchResults with empty data"""
-    results = SearchResults({})
+def test_content1_product_results_to_dict(mock_content1_response):
+    """Test Content1ProductResults to_dict method"""
+    results = Content1ProductResults(mock_content1_response)
+    results_dict = results.to_dict()
     
-    assert results.response_code is None
-    assert results.response_message is None
-    assert results.total_results == 0
-    assert results.next_cursor is None
-    assert len(results.products) == 0
+    assert results_dict['metadata']['search_after'] == 'next_page_token'
+    assert len(results_dict['products']) == 2
+    assert results_dict['products'][0]['gtin'] == '00000000000001'
+    assert results_dict['products'][1]['gtin'] == '00000000000002'
+
+
+def test_content1_hierarchy_init(mock_content1_hierarchy_response):
+    """Test Content1Hierarchy initialization"""
+    hierarchy_data = mock_content1_hierarchy_response['hierarchies'][0]
+    hierarchy = Content1Hierarchy(hierarchy_data)
+    
+    assert hierarchy.gtin == '00000000000001'
+    assert hierarchy.information_provider_gln == '1234567890123'
+    assert hierarchy.target_market == 'US'
+    assert len(hierarchy.hierarchy) == 1
+    assert hierarchy.hierarchy[0]['parentGtin'] == '00000000000001'
+    assert hierarchy.hierarchy[0]['gtin'] == '00000000000002'
+    assert hierarchy.hierarchy[0]['quantity'] == 2
+
+
+def test_content1_hierarchy_to_dict(mock_content1_hierarchy_response):
+    """Test Content1Hierarchy to_dict method"""
+    hierarchy_data = mock_content1_hierarchy_response['hierarchies'][0]
+    hierarchy = Content1Hierarchy(hierarchy_data)
+    hierarchy_dict = hierarchy.to_dict()
+    
+    assert hierarchy_dict['gtin'] == '00000000000001'
+    assert hierarchy_dict['information_provider_gln'] == '1234567890123'
+    assert hierarchy_dict['target_market'] == 'US'
+    assert len(hierarchy_dict['hierarchy']) == 1
+    assert hierarchy_dict['hierarchy'][0]['parentGtin'] == '00000000000001'
+
+
+def test_content1_hierarchy_results_init(mock_content1_hierarchy_response):
+    """Test Content1HierarchyResults initialization"""
+    results = Content1HierarchyResults(mock_content1_hierarchy_response)
+    
+    assert results.search_after == 'next_hierarchy_token'
+    assert len(results.hierarchies) == 1
+    assert isinstance(results.hierarchies[0], Content1Hierarchy)
+    assert results.hierarchies[0].gtin == '00000000000001'
+
+
+def test_content1_hierarchy_results_to_dict(mock_content1_hierarchy_response):
+    """Test Content1HierarchyResults to_dict method"""
+    results = Content1HierarchyResults(mock_content1_hierarchy_response)
+    results_dict = results.to_dict()
+    
+    assert results_dict['metadata']['search_after'] == 'next_hierarchy_token'
+    assert len(results_dict['hierarchies']) == 1
+    assert results_dict['hierarchies'][0]['gtin'] == '00000000000001'
