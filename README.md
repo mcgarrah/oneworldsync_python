@@ -69,20 +69,28 @@ results = client.fetch_products(criteria)
 The package installs a command-line tool called `ows` that can be used to interact with the Content1 API:
 
 ```bash
+# Show version
+ows --version
+
+# Show help
+ows --help
+
 # Test login credentials
 ows login
 
 # Fetch products
 ows fetch --gtin 12345678901234 --target-market US
+ows fetch --gtin 052000050585 --fields "gtin,gtinName,brandName"
 ows fetch --output results.json
 
 # Count products
 ows count --target-market EU
+ows count --limit 10
 ows count --output count.json
 
 # Fetch product hierarchies
 ows hierarchy --gtin 12345678901234
-ows hierarchy --output hierarchy.json
+ows hierarchy --target-market US --output hierarchy.json
 ```
 
 The CLI requires credentials to be stored in `~/.ows/credentials` file:

@@ -148,7 +148,14 @@ class Content1Client:
         if criteria is None:
             criteria = {}
         
+        # Debug print to see what criteria are being sent
+        # print(f"DEBUG: Sending count request with criteria: {json.dumps(criteria)}")
+        
         response = self._make_request('POST', '/V1/product/count', data=criteria)
+        
+        # Debug print to see the response
+        # print(f"DEBUG: Received count response: {json.dumps(response)}")
+        
         return response.get('count', 0)
     
     def fetch_products(self, criteria=None, page_size=1000):

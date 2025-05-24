@@ -55,6 +55,7 @@ Contents
    user/quickstart
    user/advanced_usage
    user/error_handling
+   user/cli
    openapi
 
 .. toctree::
@@ -63,6 +64,7 @@ Contents
 
    api/content1_client
    api/content1_auth
+   api/cli
    api/models
    api/exceptions
    api/utils
