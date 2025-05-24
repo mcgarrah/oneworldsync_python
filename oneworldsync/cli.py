@@ -81,13 +81,16 @@ def login():
 
 @cli.command()
 @click.option('--gtin', help='GTIN to fetch')
-@click.option('--target-market', default='US', help='Target market (default: US)')
+@click.option('--target-market', help='Target market')
 @click.option('--output', '-o', help='Output file path (default: stdout)')
 def fetch(gtin, target_market, output):
     """Fetch product data by GTIN"""
     try:
         client = get_client()
-        criteria = {"targetMarket": target_market}
+        criteria = {}
+        
+        if target_market:
+            criteria["targetMarket"] = target_market
         
         if gtin:
             criteria["gtin"] = gtin
@@ -106,14 +109,20 @@ def fetch(gtin, target_market, output):
         sys.exit(1)
 
 @cli.command()
-@click.option('--target-market', default='US', help='Target market (default: US)')
+@click.option('--target-market', help='Target market')
 @click.option('--limit', default=5, help='Number of results to return (default: 5)')
 @click.option('--output', '-o', help='Output file path (default: stdout)')
 def count(target_market, limit, output):
     """Count products"""
     try:
         client = get_client()
-        criteria = {"targetMarket": target_market}
+        criteria = {}
+        
+        if target_market:
+            criteria["targetMarket"] = target_market
+            click.echo(f"Counting products for target market: {target_market}")
+        else:
+            click.echo("Counting all products (no target market specified)")
         
         result = client.count_products(criteria)
         
@@ -132,13 +141,16 @@ def count(target_market, limit, output):
 
 @cli.command()
 @click.option('--gtin', help='GTIN to fetch hierarchy for')
-@click.option('--target-market', default='US', help='Target market (default: US)')
+@click.option('--target-market', help='Target market')
 @click.option('--output', '-o', help='Output file path (default: stdout)')
 def hierarchy(gtin, target_market, output):
     """Fetch product hierarchy"""
     try:
         client = get_client()
-        criteria = {"targetMarket": target_market}
+        criteria = {}
+        
+        if target_market:
+            criteria["targetMarket"] = target_market
         
         if gtin:
             criteria["gtin"] = gtin
