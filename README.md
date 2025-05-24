@@ -17,6 +17,7 @@ pip install oneworldsync
 - Comprehensive error handling
 - Content1-specific data models
 - OpenAPI 3.0.1 specification support
+- Command Line Interface (CLI)
 
 ## Package Structure
 
@@ -25,12 +26,15 @@ oneworldsync/
 ├── __init__.py           # Package initialization and version
 ├── content1_client.py    # Main Content1 API client
 ├── content1_auth.py      # HMAC authentication for Content1 API
-├── models.py             # Data models for API responses
-├── exceptions.py         # Custom exceptions
-└── utils.py              # Utility functions
+├── cli.py               # Command Line Interface
+├── models.py            # Data models for API responses
+├── exceptions.py        # Custom exceptions
+└── utils.py             # Utility functions
 ```
 
 ## Quick Start
+
+### Python API
 
 ```python
 from oneworldsync import Content1Client
@@ -58,6 +62,35 @@ criteria = {
     }
 }
 results = client.fetch_products(criteria)
+```
+
+### Command Line Interface
+
+The package installs a command-line tool called `ows` that can be used to interact with the Content1 API:
+
+```bash
+# Test login credentials
+ows login
+
+# Fetch products
+ows fetch --gtin 12345678901234 --target-market US
+ows fetch --output results.json
+
+# Count products
+ows count --target-market EU
+ows count --output count.json
+
+# Fetch product hierarchies
+ows hierarchy --gtin 12345678901234
+ows hierarchy --output hierarchy.json
+```
+
+The CLI requires credentials to be stored in `~/.ows/credentials` file:
+```
+ONEWORLDSYNC_APP_ID=your_app_id
+ONEWORLDSYNC_SECRET_KEY=your_secret_key
+ONEWORLDSYNC_USER_GLN=your_gln  # Optional
+ONEWORLDSYNC_CONTENT1_API_URL=https://content1-api.1worldsync.com  # Optional
 ```
 
 ## Authentication

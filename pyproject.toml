@@ -1,6 +1,6 @@
 [project]
 name = "oneworldsync"
-version = "0.2.1"
+version = "0.2.2"
 description = "A Python client for the 1WorldSync Content1 Search and Fetch REST API"
 readme = "README.md"
 authors = [
@@ -19,7 +19,13 @@ requires-python = ">=3.12"
 dependencies = [
     "requests>=2.25.0",
     "python-dotenv>=0.15.0",
+    "click>=8.0.0",
 ]
+
+[project.scripts]
+ows = "oneworldsync.cli:cli"
+
+
 
 [project.optional-dependencies]
 dev = [

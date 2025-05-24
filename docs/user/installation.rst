@@ -7,6 +7,7 @@ Requirements
 * Python 3.12 or higher
 * ``requests`` library
 * ``python-dotenv`` library (optional, for loading environment variables)
+* ``click`` library (for command line interface)
 
 Installing from PyPI
 -------------------
@@ -17,7 +18,7 @@ The recommended way to install the OneWorldSync Python Client is from PyPI:
 
    pip install oneworldsync
 
-This will install the latest stable version of the package along with its dependencies.
+This will install the latest stable version of the package along with its dependencies and the ``ows`` command line tool.
 
 Installing from Source
 --------------------
@@ -59,3 +60,15 @@ Or using the requirements file:
 .. code-block:: bash
 
    pip install -r requirements-docs.txt
+
+CLI Configuration
+---------------
+
+After installation, configure the CLI by creating a credentials file at ``~/.ows/credentials`` with the following format:
+
+.. code-block:: bash
+
+    ONEWORLDSYNC_APP_ID=your_app_id
+    ONEWORLDSYNC_SECRET_KEY=your_secret_key
+    ONEWORLDSYNC_USER_GLN=your_gln  # Optional
+    ONEWORLDSYNC_CONTENT1_API_URL=https://content1-api.1worldsync.com  # Optional
