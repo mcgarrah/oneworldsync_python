@@ -10,4 +10,4 @@ from .content1_client import Content1Client
 from .content1_auth import Content1HMACAuth
 from .exceptions import OneWorldSyncError, AuthenticationError, APIError
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'

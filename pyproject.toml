@@ -1,6 +1,6 @@
 [project]
 name = "oneworldsync"
-version = "0.2.2"
+version = "0.2.3"
 description = "A Python client for the 1WorldSync Content1 Search and Fetch REST API"
 readme = "README.md"
 authors = [

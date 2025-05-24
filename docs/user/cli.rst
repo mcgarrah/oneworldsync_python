@@ -20,6 +20,27 @@ The CLI requires credentials to be stored in ``~/.ows/credentials`` file with th
     ONEWORLDSYNC_USER_GLN=your_gln  # Optional
     ONEWORLDSYNC_CONTENT1_API_URL=https://content1-api.1worldsync.com  # Optional
 
+Global Options
+-------------
+
+--version
+~~~~~~~~
+
+Display the version of the package::
+
+    ows --version
+
+--help
+~~~~~
+
+Display help information for the CLI or a specific command::
+
+    # General help
+    ows --help
+
+    # Command-specific help
+    ows fetch --help
+
 Commands
 --------
 
@@ -46,6 +67,7 @@ Fetch product data with optional filters::
 
     # Save results to file
     ows fetch --output results.json
+    ows fetch -o results.json
 
 count
 ~~~~~
@@ -58,8 +80,12 @@ Count products matching criteria::
     # Count with target market
     ows count --target-market EU
 
+    # Limit results
+    ows count --limit 10
+
     # Save count to file
     ows count --output count.json
+    ows count -o count.json
 
 hierarchy
 ~~~~~~~~
@@ -72,5 +98,9 @@ Fetch product hierarchies::
     # Fetch hierarchy for specific GTIN
     ows hierarchy --gtin 12345678901234
 
+    # Specify target market
+    ows hierarchy --target-market US
+
     # Save hierarchy to file
     ows hierarchy --output hierarchy.json
+    ows hierarchy -o hierarchy.json
