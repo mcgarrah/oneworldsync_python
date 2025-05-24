@@ -59,11 +59,18 @@ Fetch product data with optional filters::
     # Basic fetch
     ows fetch
 
-    # Fetch by GTIN
+    # Fetch by GTIN (14-digit format, shorter GTINs are automatically padded with leading zeros)
     ows fetch --gtin 12345678901234
+    ows fetch --gtin 052000050585  # Will be padded to 00052000050585
 
     # Specify target market
     ows fetch --target-market US
+
+    # Fetch specific fields only
+    ows fetch --gtin 052000050585 --fields "gtin,gtinName,brandName"
+    
+    # Combine options
+    ows fetch --gtin 052000050585 --target-market US --fields "gtin,gtinName,brandName"
 
     # Save results to file
     ows fetch --output results.json
@@ -95,8 +102,9 @@ Fetch product hierarchies::
     # Basic hierarchy fetch
     ows hierarchy
 
-    # Fetch hierarchy for specific GTIN
+    # Fetch hierarchy for specific GTIN (14-digit format, shorter GTINs are automatically padded with leading zeros)
     ows hierarchy --gtin 12345678901234
+    ows hierarchy --gtin 052000050585  # Will be padded to 00052000050585
 
     # Specify target market
     ows hierarchy --target-market US

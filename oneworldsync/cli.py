@@ -80,10 +80,11 @@ def login():
         sys.exit(1)
 
 @cli.command()
-@click.option('--gtin', help='GTIN to fetch')
+@click.option('--gtin', help='GTIN to fetch (14-digit format, pad shorter GTINs with leading zeros)')
 @click.option('--target-market', help='Target market')
+@click.option('--fields', help='Comma-separated list of fields to include (e.g., "gtin,gtinName")')
 @click.option('--output', '-o', help='Output file path (default: stdout)')
-def fetch(gtin, target_market, output):
+def fetch(gtin, target_market, fields, output):
     """Fetch product data by GTIN"""
     try:
         client = get_client()
@@ -93,7 +94,13 @@ def fetch(gtin, target_market, output):
             criteria["targetMarket"] = target_market
         
         if gtin:
-            criteria["gtin"] = gtin
+            # Ensure GTIN is 14 digits by padding with leading zeros if needed
+            padded_gtin = gtin.zfill(14)
+            criteria["gtin"] = [padded_gtin]  # API expects an array of GTINs
+            
+        if fields:
+            field_list = [f.strip() for f in fields.split(',')]
+            criteria["fields"] = {"include": field_list}
             
         result = client.fetch_products(criteria)
         
@@ -140,7 +147,7 @@ def count(target_market, limit, output):
         sys.exit(1)
 
 @cli.command()
-@click.option('--gtin', help='GTIN to fetch hierarchy for')
+@click.option('--gtin', help='GTIN to fetch hierarchy for (14-digit format, pad shorter GTINs with leading zeros)')
 @click.option('--target-market', help='Target market')
 @click.option('--output', '-o', help='Output file path (default: stdout)')
 def hierarchy(gtin, target_market, output):
@@ -153,7 +160,9 @@ def hierarchy(gtin, target_market, output):
             criteria["targetMarket"] = target_market
         
         if gtin:
-            criteria["gtin"] = gtin
+            # Ensure GTIN is 14 digits by padding with leading zeros if needed
+            padded_gtin = gtin.zfill(14)
+            criteria["gtin"] = [padded_gtin]  # API expects an array of GTINs
             
         result = client.fetch_hierarchies(criteria)
         

@@ -80,6 +80,7 @@ ows login
 
 # Fetch products
 ows fetch --gtin 12345678901234 --target-market US
+ows fetch --gtin 052000050585 --fields "gtin,gtinName,brandName"
 ows fetch --output results.json
 
 # Count products
