@@ -77,8 +77,8 @@ Count products matching criteria::
     # Basic count
     ows count
 
-    # Count with target market
-    ows count --target-market EU
+    # Count with target market (US, DE, FR, etc.)
+    ows count --target-market DE
 
     # Limit results
     ows count --limit 10

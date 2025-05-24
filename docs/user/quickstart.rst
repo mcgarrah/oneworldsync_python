@@ -19,7 +19,7 @@ The package includes a command-line tool called ``ows`` that provides quick acce
 
    # Count products
    ows count
-   ows count --target-market EU
+   ows count --target-market DE
 
    # Get product hierarchies
    ows hierarchy --gtin 12345678901234
