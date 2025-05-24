@@ -242,13 +242,14 @@ class Content1Client:
         }
         return self.fetch_products(criteria, page_size)
     
-    def fetch_next_page(self, previous_response, page_size=1000):
+    def fetch_next_page(self, previous_response, page_size=1000, original_criteria=None):
         """
         Fetch the next page of products using the searchAfter value from a previous response
         
         Args:
             previous_response (dict): Previous response from fetch_products
             page_size (int, optional): Number of products to return per page. Defaults to 1000.
+            original_criteria (dict, optional): Original search criteria to preserve. Defaults to None.
             
         Returns:
             dict: Next page of product fetch results
@@ -256,7 +257,10 @@ class Content1Client:
         if 'searchAfter' not in previous_response:
             raise ValueError("Previous response does not contain searchAfter value")
         
-        criteria = {
-            'searchAfter': previous_response['searchAfter']
-        }
+        # Start with original criteria if provided
+        criteria = {} if original_criteria is None else original_criteria.copy()
+        
+        # Add searchAfter parameter
+        criteria['searchAfter'] = previous_response['searchAfter']
+        
         return self.fetch_products(criteria, page_size)
