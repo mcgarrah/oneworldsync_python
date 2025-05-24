@@ -3,6 +3,29 @@ Quickstart
 
 This guide will help you get started with the 1WorldSync Content1 API Python Client.
 
+Command Line Interface
+--------------------
+
+The package includes a command-line tool called ``ows`` that provides quick access to common operations:
+
+.. code-block:: bash
+
+   # Test your credentials
+   ows login
+
+   # Fetch products
+   ows fetch --gtin 12345678901234
+   ows fetch --target-market US --output results.json
+
+   # Count products
+   ows count
+   ows count --target-market EU
+
+   # Get product hierarchies
+   ows hierarchy --gtin 12345678901234
+
+For more details on the CLI, see :doc:`cli`.
+
 Basic Setup
 ----------
 

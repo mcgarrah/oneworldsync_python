@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2025-05-23
+
+### Added
+- New command line interface (CLI) tool 'ows' for common Content1 API operations
+- CLI commands for login verification, product fetching, counting, and hierarchy retrieval
+- CLI configuration support via ~/.ows/credentials file
+- Added --version option to CLI to display package version
+
 ## [0.2.1] - 2025-05-20
 
 ### Changed
