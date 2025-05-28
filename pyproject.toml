@@ -1,12 +1,10 @@
 [project]
 name = "oneworldsync"
-version = "0.2.3"
-description = "A Python client for the 1WorldSync Content1 Search and Fetch REST API"
+version = "0.2.4"
+description = "A Python client for the 1WorldSync Content1 REST API"
 readme = "README.md"
-authors = [
-    {name = "Michael McGarrah", email = "mcgarrah@gmail.com"}
-]
-license = {text = "MIT"}
+authors = [{ name = "Michael McGarrah", email = "mcgarrah@gmail.com" }]
+license = { text = "MIT" }
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -16,15 +14,10 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 requires-python = ">=3.12"
-dependencies = [
-    "requests>=2.25.0",
-    "python-dotenv>=0.15.0",
-    "click>=8.0.0",
-]
+dependencies = ["requests>=2.25.0", "python-dotenv>=0.15.0", "click>=8.0.0"]
 
 [project.scripts]
 ows = "oneworldsync.cli:cli"
-
 
 
 [project.optional-dependencies]
@@ -38,10 +31,7 @@ dev = [
     "bandit>=1.7",
     "pre-commit>=2.13",
 ]
-docs = [
-    "sphinx>=4.0",
-    "sphinx-rtd-theme>=1.0",
-]
+docs = ["sphinx>=4.0", "sphinx-rtd-theme>=1.0"]
 
 
 [project.urls]
@@ -59,9 +49,7 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-filterwarnings = [
-    "ignore::DeprecationWarning",
-]
+filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.coverage.run]
 source = ["oneworldsync"]

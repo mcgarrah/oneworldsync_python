@@ -168,9 +168,8 @@ products = client.fetch_products(fetch_criteria, page_size=10)
 
 # Handle pagination
 if "searchAfter" in products:
-    next_page_criteria = fetch_criteria.copy()
-    next_page_criteria["searchAfter"] = products["searchAfter"]
-    next_page = client.fetch_products(next_page_criteria, page_size=10)
+    # Use fetch_next_page with original criteria to maintain filters
+    next_page = client.fetch_next_page(products, page_size=10, original_criteria=fetch_criteria)
 ```
 
 ## Documentation

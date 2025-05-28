@@ -104,12 +104,8 @@ def main():
             if "searchAfter" in products:
                 print("\nFetching next page...")
                 
-                # Create criteria for next page
-                next_page_criteria = fetch_criteria.copy()
-                next_page_criteria["searchAfter"] = products["searchAfter"]
-                
-                # Fetch next page
-                next_page = client.fetch_products(next_page_criteria, page_size=10)
+                # Fetch next page using fetch_next_page with original criteria
+                next_page = client.fetch_next_page(products, page_size=10, original_criteria=fetch_criteria)
                 
                 if "items" in next_page and next_page["items"]:
                     print(f"Found {len(next_page['items'])} products on second page")
