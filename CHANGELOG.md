@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] - 2025-05-27
+
+### Fixed
+- Fixed `fetch_next_page` method to preserve original search criteria when fetching subsequent pages
+- Added `original_criteria` parameter to `fetch_next_page` to maintain filtering across paginated requests
+
+## [0.2.3] - 2025-05-24
+
+### Added
+- Added fields parameter for more granular control over returned data
+- Improved GTIN handling in API requests
+- Enhanced examples with real-world use cases
+
+### Changed
+- Removed default US target market from CLI tool
+- Updated CLI documentation for clarity
+
+### Fixed
+- Fixed target-market examples to use valid market values (EU is not valid)
+
 ## [0.2.2] - 2025-05-23
 
 ### Added
