@@ -1,0 +1,20 @@
+Add nutritional data integration support
+
+This commit adds support for extracting nutritional information from food/beverage products in the 1WorldSync Content1 API. Key changes include:
+
+- Added examples for nutritional data extraction and integration with Django
+- Created documentation for nutritional data structure and nutrient code mapping
+- Identified the correct path to nutritional information in the API response
+- Provided a list of known food product GTINs with reliable nutritional information
+- Updated README and documentation with key findings
+- Added test scripts for both standalone and Django-dependent usage
+- Updated CHANGELOG.md for v0.2.5 release
+
+The nutritional information is found in `item -> nutrientInformation -> nutrientDetail` rather than in `tradeItemInformation` as initially expected.
+
+Example files:
+- simple_nutrition_example.py: Standalone example for nutritional data extraction
+- django_nutrition_service.py: Django service for retrieving nutritional information
+- django_food_nutrition_example.py: Example for food/beverage products
+- test_django_nutrition_service.py: Test script for Django integration
+- README_nutrition.md: Detailed documentation on nutritional data integration

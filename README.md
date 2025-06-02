@@ -13,6 +13,7 @@ pip install oneworldsync
 - Authentication with HMAC
 - Product fetching by GTIN, GLN, or target market
 - Product hierarchy retrieval
+- Nutritional information extraction for food/beverage products
 - Pagination support
 - Comprehensive error handling
 - Content1-specific data models
@@ -125,10 +126,30 @@ client = Content1Client()
 
 See the [examples](examples/) directory for more detailed usage examples:
 
-### Basic Example (content1_example.py)
-Basic usage of the Content1 API client to fetch products.
+### Basic Examples
+- **content1_example.py**: Basic usage of the Content1 API client to fetch products
+- **content1_advanced_example.py**: Advanced usage with date filtering and pagination
 
-### Advanced Example (content1_advanced_example.py)
+### Nutritional Information Examples
+- **simple_nutrition_example.py**: Simple example showing how to extract nutritional information
+- **django_nutrition_service.py**: Django service for retrieving nutritional information
+- **django_food_nutrition_example.py**: Example for food/beverage products with nutritional data
+
+### Key Finding: Nutritional Information Structure
+Nutritional information in the Content1 API is found in:
+```
+item -> nutrientInformation -> nutrientDetail
+```
+
+Each nutrient detail contains:
+- `nutrientTypeCode`: The type of nutrient (e.g., "ENER-" for calories)
+- `quantityContained`: The amount of the nutrient
+- `dailyValueIntakePercent`: The percentage of daily value (if applicable)
+
+For more details on nutritional data integration, see [README_nutrition.md](examples/README_nutrition.md).
+
+## Advanced Example
+
 ```python
 # Create a date range for the last 30 days
 today = datetime.datetime.now()

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.5] - 2025-06-02
+
+### Added
+- Support for extracting nutritional information from food/beverage products
+- New examples for nutritional data integration with Django
+- Documentation for nutritional data structure and nutrient code mapping
+- List of known food product GTINs with reliable nutritional information
+
+### Fixed
+- Corrected documentation on the location of nutritional information in the API response
+- Updated README with key findings about nutritional data structure
+
 ## [0.2.4] - 2025-05-27
 
 ### Fixed
