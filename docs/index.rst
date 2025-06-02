@@ -25,6 +25,7 @@ Key Features
 * **HMAC Authentication**: Handles the complex HMAC authentication required by the 1WorldSync API.
 * **Easy-to-use Client**: Provides a simple interface for interacting with the API.
 * **Data Models**: Structured models for API responses, making it easier to work with the data.
+* **Nutritional Information**: Extract nutritional data from food/beverage products.
 * **Error Handling**: Custom exceptions for different types of errors.
 * **Examples**: Ready-to-use example scripts demonstrating common use cases.
 
@@ -54,6 +55,7 @@ Contents
    user/authentication
    user/quickstart
    user/advanced_usage
+   user/nutritional_data
    user/error_handling
    user/cli
    openapi
