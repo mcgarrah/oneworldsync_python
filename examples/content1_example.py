@@ -7,7 +7,14 @@ Example script demonstrating how to use the 1WorldSync Content1 API client.
 import os
 import json
 from dotenv import load_dotenv
-from oneworldsync import Content1Client, AuthenticationError, APIError
+from oneworldsync import (
+    Content1Client, 
+    AuthenticationError, 
+    APIError,
+    ProductCriteria,
+    DateRangeCriteria,
+    SortField
+)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -70,22 +77,15 @@ def main():
         
         print(f"Products saved to content1_products.json")
         
-        # Example 3: Fetch products with criteria
+        # Example 3: Fetch products with criteria using the builder pattern
         print("\nFetching products with custom criteria...")
-        criteria = {
-            "targetMarket": "US",
-            "lastModifiedDate": {
-                "from": {
-                    "date": "2023-01-01",
-                    "op": "GTE"
-                },
-                "to": {
-                    "date": "2023-12-31",
-                    "op": "LTE"
-                }
-            },
-            "fields": {
-                "include": [
+        
+        # Create criteria using the builder pattern
+        criteria = ProductCriteria() \
+            .with_target_market("US") \
+            .with_last_modified_date(DateRangeCriteria.between("2023-01-01", "2023-12-31")) \
+            .with_fields(
+                include=[
                     "gtin",
                     "informationProviderGLN",
                     "targetMarket",
@@ -93,44 +93,29 @@ def main():
                     "brandName",
                     "gpcCategory"
                 ]
-            }
-        }
+            )
         
         products = client.fetch_products(criteria, page_size=10)
         
-        # Check if we have items in the response
-        if "items" in products and products["items"]:
-            print(f"Found {len(products['items'])} products")
-            
+        # Process the results - products is now a Content1ProductResults object
+        print(f"Found {len(products)} products")
+        
+        if len(products) > 0:
             # Display information about the first product
-            first_product = products["items"][0]
+            first_product = products[0]
             print("\nFirst product details:")
-            
-            # Extract and print GTIN if available
-            if "gtin" in first_product:
-                print(f"  GTIN: {first_product['gtin']}")
-            
-            # Extract and print item details if available
-            if "item" in first_product:
-                item = first_product["item"]
-                
-                # Try to extract brand name
-                try:
-                    brand_name = item.get("brandName", "N/A")
-                    print(f"  Brand: {brand_name}")
-                except (KeyError, TypeError):
-                    print("  Brand: N/A")
-                
-                # Try to extract GPC category
-                try:
-                    gpc_category = item.get("gpcCategory", "N/A")
-                    print(f"  GPC Category: {gpc_category}")
-                except (KeyError, TypeError):
-                    print("  GPC Category: N/A")
+            print(f"  GTIN: {first_product.gtin}")
+            print(f"  Brand: {first_product.brand_name}")
+            print(f"  GPC Category: {first_product.gpc_category}")
             
             # Check if there are more pages
-            if "searchAfter" in products:
+            if products.search_after:
                 print("\nMore pages available. Use fetch_next_page to retrieve them.")
+                
+                # Example of fetching the next page
+                print("\nFetching next page...")
+                next_page = client.fetch_next_page(products, page_size=10, original_criteria=criteria)
+                print(f"Found {len(next_page)} products on the next page")
         else:
             print("No products found matching the criteria.")
         
