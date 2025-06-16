@@ -12,6 +12,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from .content1_client import Content1Client
 from .exceptions import AuthenticationError, APIError
+from .criteria import ProductCriteria, DateRangeCriteria, SortField
 
 def load_credentials():
     """Load credentials from ~/.ows/credentials file"""
@@ -83,33 +84,48 @@ def login():
 @click.option('--gtin', help='GTIN to fetch (14-digit format, pad shorter GTINs with leading zeros)')
 @click.option('--target-market', help='Target market')
 @click.option('--fields', help='Comma-separated list of fields to include (e.g., "gtin,gtinName")')
+@click.option('--last-days', type=int, help='Fetch products modified in the last N days')
+@click.option('--brand', help='Brand name to filter by')
+@click.option('--gpc-code', help='GPC code to filter by')
 @click.option('--output', '-o', help='Output file path (default: stdout)')
-def fetch(gtin, target_market, fields, output):
-    """Fetch product data by GTIN"""
+def fetch(gtin, target_market, fields, last_days, brand, gpc_code, output):
+    """Fetch product data with various filters"""
     try:
         client = get_client()
-        criteria = {}
+        criteria = ProductCriteria()
         
         if target_market:
-            criteria["targetMarket"] = target_market
+            criteria.with_target_market(target_market)
         
         if gtin:
             # Ensure GTIN is 14 digits by padding with leading zeros if needed
             padded_gtin = gtin.zfill(14)
-            criteria["gtin"] = [padded_gtin]  # API expects an array of GTINs
+            criteria.with_gtin([padded_gtin])  # API expects an array of GTINs
             
         if fields:
             field_list = [f.strip() for f in fields.split(',')]
-            criteria["fields"] = {"include": field_list}
+            criteria.with_fields(include=field_list)
+        
+        if last_days:
+            criteria.with_last_modified_date(DateRangeCriteria.last_days(last_days))
+            
+        if brand:
+            criteria.with_brand_name(brand)
+            
+        if gpc_code:
+            criteria.with_gpc_code(gpc_code)
             
         result = client.fetch_products(criteria)
         
+        # Convert to dictionary for JSON serialization
+        result_dict = result.to_dict()
+        
         if output:
             with open(output, 'w') as f:
-                json.dump(result, f, indent=2)
+                json.dump(result_dict, f, indent=2)
             click.echo(f"Results saved to {output}")
         else:
-            click.echo(json.dumps(result, indent=2))
+            click.echo(json.dumps(result_dict, indent=2))
             
     except (AuthenticationError, APIError) as e:
         click.echo(f"Error: {e}", err=True)
@@ -117,19 +133,33 @@ def fetch(gtin, target_market, fields, output):
 
 @cli.command()
 @click.option('--target-market', help='Target market')
-@click.option('--limit', default=5, help='Number of results to return (default: 5)')
+@click.option('--last-days', type=int, help='Count products modified in the last N days')
+@click.option('--brand', help='Brand name to filter by')
+@click.option('--gpc-code', help='GPC code to filter by')
 @click.option('--output', '-o', help='Output file path (default: stdout)')
-def count(target_market, limit, output):
-    """Count products"""
+def count(target_market, last_days, brand, gpc_code, output):
+    """Count products with various filters"""
     try:
         client = get_client()
-        criteria = {}
+        criteria = ProductCriteria()
         
         if target_market:
-            criteria["targetMarket"] = target_market
+            criteria.with_target_market(target_market)
             click.echo(f"Counting products for target market: {target_market}")
         else:
             click.echo("Counting all products (no target market specified)")
+            
+        if last_days:
+            criteria.with_last_modified_date(DateRangeCriteria.last_days(last_days))
+            click.echo(f"Filtering by last {last_days} days")
+            
+        if brand:
+            criteria.with_brand_name(brand)
+            click.echo(f"Filtering by brand: {brand}")
+            
+        if gpc_code:
+            criteria.with_gpc_code(gpc_code)
+            click.echo(f"Filtering by GPC code: {gpc_code}")
         
         result = client.count_products(criteria)
         
@@ -149,29 +179,36 @@ def count(target_market, limit, output):
 @cli.command()
 @click.option('--gtin', help='GTIN to fetch hierarchy for (14-digit format, pad shorter GTINs with leading zeros)')
 @click.option('--target-market', help='Target market')
+@click.option('--last-days', type=int, help='Fetch hierarchies modified in the last N days')
 @click.option('--output', '-o', help='Output file path (default: stdout)')
-def hierarchy(gtin, target_market, output):
+def hierarchy(gtin, target_market, last_days, output):
     """Fetch product hierarchy"""
     try:
         client = get_client()
-        criteria = {}
+        criteria = ProductCriteria()
         
         if target_market:
-            criteria["targetMarket"] = target_market
+            criteria.with_target_market(target_market)
         
         if gtin:
             # Ensure GTIN is 14 digits by padding with leading zeros if needed
             padded_gtin = gtin.zfill(14)
-            criteria["gtin"] = [padded_gtin]  # API expects an array of GTINs
+            criteria.with_gtin([padded_gtin])  # API expects an array of GTINs
+            
+        if last_days:
+            criteria.with_last_modified_date(DateRangeCriteria.last_days(last_days))
             
         result = client.fetch_hierarchies(criteria)
         
+        # Convert to dictionary for JSON serialization
+        result_dict = result.to_dict()
+        
         if output:
             with open(output, 'w') as f:
-                json.dump(result, f, indent=2)
+                json.dump(result_dict, f, indent=2)
             click.echo(f"Results saved to {output}")
         else:
-            click.echo(json.dumps(result, indent=2))
+            click.echo(json.dumps(result_dict, indent=2))
             
     except (AuthenticationError, APIError) as e:
         click.echo(f"Error: {e}", err=True)
@@ -179,3 +216,35 @@ def hierarchy(gtin, target_market, output):
 
 if __name__ == '__main__':
     cli()
+@cli.command()
+@click.option('--target-market', help='Target market')
+@click.option('--output', '-o', help='Output file path (default: stdout)')
+def recent(target_market, output):
+    """Fetch products modified in the last 30 days"""
+    try:
+        client = get_client()
+        
+        click.echo(f"Fetching products modified in the last 30 days...")
+        if target_market:
+            click.echo(f"Filtering by target market: {target_market}")
+            
+        result = client.fetch_products_last_30_days(target_market=target_market)
+        
+        # Convert to dictionary for JSON serialization
+        result_dict = result.to_dict()
+        
+        if output:
+            with open(output, 'w') as f:
+                json.dump(result_dict, f, indent=2)
+            click.echo(f"Results saved to {output}")
+        else:
+            click.echo(f"Found {len(result)} products")
+            for i, product in enumerate(result):
+                if i >= 5:  # Only show first 5 products
+                    click.echo("...")
+                    break
+                click.echo(f"{i+1}. {product.brand_name} - {product.gtin} - {product.last_modified_date}")
+            
+    except (AuthenticationError, APIError) as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)

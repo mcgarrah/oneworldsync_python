@@ -57,10 +57,17 @@ Count the number of products available:
    count = client.count_products()
    print(f"Total products: {count}")
    
-   # Count products with criteria
+   # Count products with criteria (traditional way)
    criteria = {
        "targetMarket": "US"
    }
+   count = client.count_products(criteria)
+   print(f"US products: {count}")
+   
+   # Count products with criteria builder (new way)
+   from oneworldsync import ProductCriteria
+   
+   criteria = ProductCriteria().with_target_market("US")
    count = client.count_products(criteria)
    print(f"US products: {count}")
 
@@ -79,6 +86,24 @@ Fetch products with various criteria:
    
    # Fetch products by target market
    products = client.fetch_products_by_target_market("US")
+   
+   # New methods for common search patterns
+   
+   # Fetch products by date range
+   products = client.fetch_products_by_date_range(
+       from_date="2023-01-01", 
+       to_date="2023-01-31",
+       target_market="US"
+   )
+   
+   # Fetch products from the last 30 days
+   products = client.fetch_products_last_30_days(target_market="US")
+   
+   # Fetch products by brand name
+   products = client.fetch_products_by_brand("Brand Name", target_market="US")
+   
+   # Fetch products by GPC code
+   products = client.fetch_products_by_gpc_code("10000248", target_market="US")
 
 Advanced Fetching
 -----------------
@@ -87,7 +112,7 @@ Use more complex criteria for fetching products:
 
 .. code-block:: python
 
-   # Create criteria with field selection and sorting
+   # Traditional way with dictionary
    criteria = {
        "targetMarket": "US",
        "fields": {
@@ -109,6 +134,27 @@ Use more complex criteria for fetching products:
    
    # Fetch products with page size
    products = client.fetch_products(criteria, page_size=100)
+   
+   # New way with criteria builder
+   from oneworldsync import ProductCriteria, SortField
+   
+   criteria = ProductCriteria() \
+       .with_target_market("US") \
+       .with_fields(
+           include=[
+               "gtin", 
+               "informationProviderGLN", 
+               "targetMarket",
+               "brandName", 
+               "gpcCategory"
+           ]
+       ) \
+       .with_sort([
+           SortField.create("lastModifiedDate", descending=True)
+       ])
+   
+   # Fetch products with page size
+   products = client.fetch_products(criteria, page_size=100)
 
 Working with Pagination
 -------------------------
@@ -120,18 +166,19 @@ Handle pagination for large result sets:
    # Fetch first page
    products = client.fetch_products(criteria, page_size=100)
    
-   # Process first page
-   for item in products.get("items", []):
-       print(f"GTIN: {item.get('gtin')}")
+   # Process first page - products is now a Content1ProductResults object
+   for product in products:
+       print(f"GTIN: {product.gtin}")
+       print(f"Brand: {product.brand_name}")
    
    # Check if there are more pages
-   if "searchAfter" in products:
-       # Create criteria for next page
-       next_page_criteria = criteria.copy()
-       next_page_criteria["searchAfter"] = products["searchAfter"]
+   if products.search_after:
+       # Fetch next page using the simplified method
+       next_page = client.fetch_next_page(products, page_size=100, original_criteria=criteria)
        
-       # Fetch next page
-       next_page = client.fetch_products(next_page_criteria, page_size=100)
+       # Process next page
+       for product in next_page:
+           print(f"GTIN: {product.gtin}")
 
 Fetching Product Hierarchies
 -------------------------
@@ -143,16 +190,25 @@ Get product hierarchy information:
    # Fetch hierarchies
    hierarchies = client.fetch_hierarchies()
    
-   # Process hierarchies
-   for hierarchy in hierarchies.get("hierarchies", []):
-       print(f"GTIN: {hierarchy.get('gtin')}")
-       print(f"Target Market: {hierarchy.get('targetMarket')}")
+   # Process hierarchies - hierarchies is now a Content1HierarchyResults object
+   for hierarchy in hierarchies:
+       print(f"GTIN: {hierarchy.gtin}")
+       print(f"Target Market: {hierarchy.target_market}")
        
        # Process hierarchy structure
-       for level in hierarchy.get("hierarchy", []):
+       for level in hierarchy.hierarchy:
            print(f"Parent GTIN: {level.get('parentGtin')}")
            print(f"Child GTIN: {level.get('gtin')}")
            print(f"Quantity: {level.get('quantity')}")
+   
+   # You can also use the criteria builder for hierarchies
+   from oneworldsync import ProductCriteria, DateRangeCriteria
+   
+   criteria = ProductCriteria() \
+       .with_target_market("US") \
+       .with_last_modified_date(DateRangeCriteria.last_30_days())
+   
+   hierarchies = client.fetch_hierarchies(criteria)
 
 Error Handling
 ------------------------

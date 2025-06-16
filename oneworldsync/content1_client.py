@@ -7,8 +7,12 @@ This module provides a client for interacting with the 1WorldSync Content1 API.
 import os
 import json
 import requests
+from datetime import datetime, timedelta
+from typing import List, Dict, Any, Optional, Union
 from .content1_auth import Content1HMACAuth
 from .exceptions import APIError, AuthenticationError
+from .criteria import ProductCriteria, DateRangeCriteria, SortField
+from .models import Content1ProductResults, Content1HierarchyResults
 
 
 class Content1Client:
@@ -140,22 +144,17 @@ class Content1Client:
         Count products using the Content1 API
         
         Args:
-            criteria (dict, optional): Search criteria. Defaults to empty dict.
+            criteria (dict or ProductCriteria, optional): Search criteria. Defaults to empty dict.
             
         Returns:
             int: Count of products matching the criteria
         """
         if criteria is None:
             criteria = {}
-        
-        # Debug print to see what criteria are being sent
-        # print(f"DEBUG: Sending count request with criteria: {json.dumps(criteria)}")
+        elif isinstance(criteria, ProductCriteria):
+            criteria = criteria.build()
         
         response = self._make_request('POST', '/V1/product/count', data=criteria)
-        
-        # Debug print to see the response
-        # print(f"DEBUG: Received count response: {json.dumps(response)}")
-        
         return response.get('count', 0)
     
     def fetch_products(self, criteria=None, page_size=1000):
@@ -163,36 +162,40 @@ class Content1Client:
         Fetch products using the Content1 API
         
         Args:
-            criteria (dict, optional): Search criteria. Defaults to empty dict.
+            criteria (dict or ProductCriteria, optional): Search criteria. Defaults to empty dict.
             page_size (int, optional): Number of products to return per page. Defaults to 1000.
             
         Returns:
-            dict: Product fetch results
+            Content1ProductResults: Product fetch results
         """
         if criteria is None:
             criteria = {}
+        elif isinstance(criteria, ProductCriteria):
+            criteria = criteria.build()
         
         query_params = {'pageSize': page_size}
         response = self._make_request('POST', '/V1/product/fetch', query_params=query_params, data=criteria)
-        return response
+        return Content1ProductResults(response)
     
     def fetch_hierarchies(self, criteria=None, page_size=1000):
         """
         Fetch product hierarchies using the Content1 API
         
         Args:
-            criteria (dict, optional): Search criteria. Defaults to empty dict.
+            criteria (dict or ProductCriteria, optional): Search criteria. Defaults to empty dict.
             page_size (int, optional): Number of hierarchies to return per page. Defaults to 1000.
             
         Returns:
-            dict: Hierarchy fetch results
+            Content1HierarchyResults: Hierarchy fetch results
         """
         if criteria is None:
             criteria = {}
+        elif isinstance(criteria, ProductCriteria):
+            criteria = criteria.build()
         
         query_params = {'pageSize': page_size}
         response = self._make_request('POST', '/V1/product/hierarchy', query_params=query_params, data=criteria)
-        return response
+        return Content1HierarchyResults(response)
     
     def fetch_products_by_gtin(self, gtins, page_size=1000):
         """
@@ -247,20 +250,126 @@ class Content1Client:
         Fetch the next page of products using the searchAfter value from a previous response
         
         Args:
-            previous_response (dict): Previous response from fetch_products
+            previous_response (dict or Content1ProductResults): Previous response from fetch_products
             page_size (int, optional): Number of products to return per page. Defaults to 1000.
-            original_criteria (dict, optional): Original search criteria to preserve. Defaults to None.
+            original_criteria (dict or ProductCriteria, optional): Original search criteria to preserve. Defaults to None.
             
         Returns:
-            dict: Next page of product fetch results
+            Content1ProductResults: Next page of product fetch results
         """
-        if 'searchAfter' not in previous_response:
-            raise ValueError("Previous response does not contain searchAfter value")
+        # Handle Content1ProductResults object
+        if isinstance(previous_response, Content1ProductResults):
+            search_after = previous_response.search_after
+        else:
+            if 'searchAfter' not in previous_response:
+                raise ValueError("Previous response does not contain searchAfter value")
+            search_after = previous_response['searchAfter']
         
-        # Start with original criteria if provided
-        criteria = {} if original_criteria is None else original_criteria.copy()
+        # Handle original criteria
+        if original_criteria is None:
+            criteria = {}
+        elif isinstance(original_criteria, ProductCriteria):
+            criteria = original_criteria.build()
+        else:
+            criteria = original_criteria.copy()
         
         # Add searchAfter parameter
-        criteria['searchAfter'] = previous_response['searchAfter']
+        criteria['searchAfter'] = search_after
+        
+        return self.fetch_products(criteria, page_size)
+    def fetch_products_by_date_range(self, from_date, to_date, target_market=None, page_size=1000):
+        """
+        Fetch products by last modified date range
+        
+        Args:
+            from_date (str): Start date in YYYY-MM-DD format
+            to_date (str): End date in YYYY-MM-DD format
+            target_market (str, optional): Target market code (e.g., 'US'). Defaults to None.
+            page_size (int, optional): Number of products to return per page. Defaults to 1000.
+            
+        Returns:
+            Content1ProductResults: Product fetch results
+        """
+        criteria = ProductCriteria()
+        criteria.with_last_modified_date(DateRangeCriteria.between(from_date, to_date))
+        
+        if target_market:
+            criteria.with_target_market(target_market)
+        
+        return self.fetch_products(criteria, page_size)
+    
+    def fetch_products_last_30_days(self, target_market=None, page_size=1000):
+        """
+        Fetch products modified in the last 30 days
+        
+        Args:
+            target_market (str, optional): Target market code (e.g., 'US'). Defaults to None.
+            page_size (int, optional): Number of products to return per page. Defaults to 1000.
+            
+        Returns:
+            Content1ProductResults: Product fetch results
+        """
+        criteria = ProductCriteria()
+        criteria.with_last_modified_date(DateRangeCriteria.last_30_days())
+        
+        if target_market:
+            criteria.with_target_market(target_market)
+        
+        return self.fetch_products(criteria, page_size)
+    
+    def fetch_products_by_brand(self, brand_name, target_market=None, page_size=1000):
+        """
+        Fetch products by brand name
+        
+        Args:
+            brand_name (str): Brand name to search for
+            target_market (str, optional): Target market code (e.g., 'US'). Defaults to None.
+            page_size (int, optional): Number of products to return per page. Defaults to 1000.
+            
+        Returns:
+            Content1ProductResults: Product fetch results
+        """
+        criteria = ProductCriteria().with_brand_name(brand_name)
+        
+        if target_market:
+            criteria.with_target_market(target_market)
+        
+        return self.fetch_products(criteria, page_size)
+    
+    def fetch_products_by_gpc_code(self, gpc_code, target_market=None, page_size=1000):
+        """
+        Fetch products by GPC code
+        
+        Args:
+            gpc_code (str): GPC code to search for
+            target_market (str, optional): Target market code (e.g., 'US'). Defaults to None.
+            page_size (int, optional): Number of products to return per page. Defaults to 1000.
+            
+        Returns:
+            Content1ProductResults: Product fetch results
+        """
+        criteria = ProductCriteria().with_gpc_code(gpc_code)
+        
+        if target_market:
+            criteria.with_target_market(target_market)
+        
+        return self.fetch_products(criteria, page_size)
+    
+    def fetch_products_by_upc(self, upc_code, target_market=None, page_size=1000):
+        """
+        Fetch products by UPC code
+        
+        Args:
+            upc_code (str): UPC code to search for
+            target_market (str, optional): Target market code (e.g., 'US'). Defaults to None.
+            page_size (int, optional): Number of products to return per page. Defaults to 1000.
+            
+        Returns:
+            Content1ProductResults: Product fetch results
+        """
+        criteria = ProductCriteria().with_upc_code(upc_code)
+        
+        if target_market:
+            criteria.with_target_market(target_market)
         
         return self.fetch_products(criteria, page_size)
