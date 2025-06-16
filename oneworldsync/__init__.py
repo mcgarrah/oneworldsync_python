@@ -9,5 +9,22 @@ various endpoints of the 1WorldSync Content1 API.
 from .content1_client import Content1Client
 from .content1_auth import Content1HMACAuth
 from .exceptions import OneWorldSyncError, AuthenticationError, APIError
+from .criteria import ProductCriteria, DateRangeCriteria, SortField
+from .models import Content1Product, Content1ProductResults, Content1Hierarchy, Content1HierarchyResults
 
-__version__ = '0.2.5'
+__version__ = '0.3.1'
+
+__all__ = [
+    'Content1Client',
+    'Content1HMACAuth',
+    'OneWorldSyncError',
+    'AuthenticationError',
+    'APIError',
+    'ProductCriteria',
+    'DateRangeCriteria',
+    'SortField',
+    'Content1Product',
+    'Content1ProductResults',
+    'Content1Hierarchy',
+    'Content1HierarchyResults'
+]
