@@ -153,6 +153,7 @@ def main():
                 next_page = client.fetch_next_page(
                     products, page_size=10, original_criteria=criteria
                 )
+
                 print(f"Found {len(next_page)} products on the next page")
         else:
             print("No products found matching the criteria.")
