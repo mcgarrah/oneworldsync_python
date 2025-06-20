@@ -12,7 +12,7 @@ from .exceptions import OneWorldSyncError, AuthenticationError, APIError
 from .criteria import ProductCriteria, DateRangeCriteria, SortField
 from .models import Content1Product, Content1ProductResults, Content1Hierarchy, Content1HierarchyResults
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 __all__ = [
     'Content1Client',
